@@ -2,4 +2,14 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#3498db</color>
+    <color name="colorPrimaryDark">#2980b9</color>
+    <color name="colorAccent">#E74C3C</color>
+    <color name="favorite_red">#E74C3C</color>
+    <color name="search_gray">#666666</color>
+    <color name="share_green">#27AE60</color>
+    <color name="random_purple">#9C27B0</color>
+    <color name="text_dark">#2c3e50</color>
+    <color name="text_light">#7f8c8d</color>
+    <color name="background_gray">#f8f9fa</color>
 </resources>
