@@ -30,6 +30,8 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private boolean isShowingMeaning = false;
     private TextToSpeech textToSpeech;
     private DatabaseHelper dbHelper;
+    private RelativeLayout meaningRelativeView;
+    private TextView exampleText, exampleTranslationText;
 
     private boolean isAnimating = false;
 
@@ -60,6 +62,9 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         flashCard = findViewById(R.id.flashCard);
         wordText = findViewById(R.id.wordText);
         meaningText = findViewById(R.id.meaningText);
+        meaningRelativeView = findViewById(R.id.meaningRelativeView);
+        exampleText = findViewById(R.id.exampleText);
+        exampleTranslationText = findViewById(R.id.exampleTranslationText);
         levelText = findViewById(R.id.levelText);
         counterText = findViewById(R.id.counterText);
         speakIcon = findViewById(R.id.speakIcon);
@@ -85,19 +90,16 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
     private void setupClickListeners() {
         // کلیک روی خود کارت برای چرخاندن
-        flashCard.setOnTouchListener((v, event) -> {
-            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
-                if (!isAnimating) {
-                    flipCard();
-                }
-                return true;
+        flashCard.setOnClickListener(v -> {
+            //android.util.Log.d("StudySession", "FlashCard clicked!"); // برای دیباگ
+            if (!isAnimating) {
+                flipCard();
             }
-            return false;
         });
 
         // دکمه flip هم برای چرخاندن
         flipIcon.setOnClickListener(v -> {
-            android.util.Log.d("StudySession", "Flip icon clicked!");
+            //android.util.Log.d("StudySession", "Flip icon clicked!");
             if (!isAnimating) {
                 flipCard();
             }
@@ -210,64 +212,70 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         });
     }
 
-    private void showWord() {
-        HashMap<String, String> currentWord = studyWords.get(currentIndex);
-        wordText.setVisibility(View.VISIBLE);
-        meaningText.setVisibility(View.GONE);
-        wordText.setText(currentWord.get("word"));
-        isShowingMeaning = false;
-    }
-
     private void showMeaning() {
         HashMap<String, String> currentWord = studyWords.get(currentIndex);
         wordText.setVisibility(View.GONE);
-        meaningText.setVisibility(View.VISIBLE);
+        meaningRelativeView.setVisibility(View.VISIBLE);
+
+        // نمایش تصویر در سمت معنی
+        loadImage(currentWord.get("word"));
 
         String persian = currentWord.get("persian");
         String example = currentWord.get("example");
         String exampleTranslation = currentWord.get("example_translation");
 
-        StringBuilder meaning = new StringBuilder();
-        meaning.append(persian);
+        meaningText.setText(persian);
 
         if (example != null && !example.isEmpty()) {
-            meaning.append("\n\n📖 ").append(example);
+            exampleText.setText("📖 " + example);
+            exampleText.setVisibility(View.VISIBLE);
+        } else {
+            exampleText.setVisibility(View.GONE);
         }
 
         if (exampleTranslation != null && !exampleTranslation.isEmpty()) {
-            meaning.append("\n\n🇮🇷 ").append(exampleTranslation);
+            exampleTranslationText.setText("🇮🇷 " + exampleTranslation);
+            exampleTranslationText.setVisibility(View.VISIBLE);
+        } else {
+            exampleTranslationText.setVisibility(View.GONE);
         }
 
-        meaningText.setText(meaning.toString());
         isShowingMeaning = true;
+    }
+
+    private void showWord() {
+        HashMap<String, String> currentWord = studyWords.get(currentIndex);
+        wordText.setVisibility(View.VISIBLE);
+        meaningRelativeView.setVisibility(View.GONE);
+        isShowingMeaning = false;
     }
 
     private void updateCard() {
         HashMap<String, String> currentWord = studyWords.get(currentIndex);
 
-        // نمایش تصویر
-        loadImage(currentWord.get("word"));
-
-        // نمایش کلمه
+        // نمایش کلمه در سمت اول
         wordText.setText(currentWord.get("word"));
 
-        // ذخیره معنی
+        // ذخیره اطلاعات برای سمت دوم
         String persian = currentWord.get("persian");
         String example = currentWord.get("example");
         String exampleTranslation = currentWord.get("example_translation");
 
-        StringBuilder meaning = new StringBuilder();
-        meaning.append(persian);
+        meaningText.setText(persian);
 
         if (example != null && !example.isEmpty()) {
-            meaning.append("\n\n📖 ").append(example);
+            exampleText.setText("📖 " + example);
+            exampleText.setVisibility(View.VISIBLE);
+        } else {
+            exampleText.setVisibility(View.GONE);
         }
 
         if (exampleTranslation != null && !exampleTranslation.isEmpty()) {
-            meaning.append("\n\n🇮🇷 ").append(exampleTranslation);
+            exampleTranslationText.setText("🇮🇷 " + exampleTranslation);
+            exampleTranslationText.setVisibility(View.VISIBLE);
+        } else {
+            exampleTranslationText.setVisibility(View.GONE);
         }
-
-        meaningText.setText(meaning.toString());
 
         // سطح
         String level = currentWord.get("level");
@@ -276,13 +284,11 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
         // وضعیت اولیه (نمایش کلمه)
         wordText.setVisibility(View.VISIBLE);
-        meaningText.setVisibility(View.GONE);
+        meaningRelativeView.setVisibility(View.GONE);
         isShowingMeaning = false;
 
         // بررسی وضعیت علاقه‌مندی
         checkFavoriteStatus(currentWord.get("word"));
-
-        // بررسی وضعیت یادگیری
         checkMasteredStatus(currentWord.get("word"));
 
         updateProgress();

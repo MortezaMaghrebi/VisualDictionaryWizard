@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView welcomeText, wordCountText;
     private Button searchButton, favoritesButton, randomButton;
     private ProgressBar progressBar;
-
+    private Button masteredButton;
     private String[] levels = {"A1", "A2", "B1", "B2", "C1", "C2"};
     private String[] levelNames = {"مبتدی 1", "مبتدی 2", "متوسط 1", "متوسط 2", "پیشرفته 1", "پیشرفته 2"};
 
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         favoritesButton = findViewById(R.id.favoritesButton);
         randomButton = findViewById(R.id.randomButton);
         progressBar = findViewById(R.id.progressBar);
-
+        masteredButton = findViewById(R.id.masteredButton);
         dbHelper = new DatabaseHelper(this);
     }
 
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showWelcomeMessage() {
-        String[] greetings = {"سلام! وقت بخیر", "به دیکشنری تصویری خوش آمدید", "آماده یادگیری؟"};
+        String[] greetings = {"سلام! وقت بخیر", "به دیکشنری تصویری خوش آمدید", "آماده یادگیری ای؟"};
         int randomIndex = (int) (Math.random() * greetings.length);
         welcomeText.setText(greetings[randomIndex]);
     }
@@ -130,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 });
             }).start();
+        });
+        masteredButton.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, MasteredWordsActivity.class));
         });
     }
 }

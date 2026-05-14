@@ -99,7 +99,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
         holder.cardView.setCardElevation(4f);
 
         // تنظیم رنگ متن‌ها بر اساس سطح (برای خوانایی)
-        if (level.equals("A1") || level.equals("A2") || level.equals("B1")) {
+        if (level.equals("A1") || level.equals("A2") || level.equals("B1") || level.equals("B2")) {
             // سطوح روشن - متن تیره
             holder.levelText.setTextColor(0xFF2c3e50);
             holder.levelNameText.setTextColor(0xFF2c3e50);
@@ -116,7 +116,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
             int count = levelCounts.get(level);
             holder.wordCountText.setVisibility(View.VISIBLE);
             holder.wordCountText.setText("📚 " + count + " کلمه");
-            holder.wordCountText.setTextColor(level.equals("A1") || level.equals("A2") || level.equals("B1") ? 0xFF2c3e50 : 0xFFFFFFFF);
+            holder.wordCountText.setTextColor(level.equals("A1") || level.equals("A2") || level.equals("B1")  || level.equals("B2") ? 0xFF2c3e50 : 0xFFFFFFFF);
         } else {
             holder.wordCountText.setVisibility(View.GONE);
         }

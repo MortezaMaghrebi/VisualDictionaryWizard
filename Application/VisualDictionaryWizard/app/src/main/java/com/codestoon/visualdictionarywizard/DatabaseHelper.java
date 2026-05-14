@@ -120,7 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // جستجوی کلمات (با اولویت بندی - طبق مقاله سفر کاربر)
-    public ArrayList<HashMap<String, String>> searchWords(String query) {
+    public ArrayList<HashMap<String, String>> searchWords1(String query) {
         ArrayList<HashMap<String, String>> results = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -152,6 +152,82 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return results;
     }
 
+    // جستجوی کلمات (با اولویت بندی - طبق مقاله سفر کاربر)
+    public ArrayList<HashMap<String, String>> searchWords(String query) {
+        ArrayList<HashMap<String, String>> results = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String lowerQuery = query.toLowerCase();
+
+        // 1. کلماتی که دقیقاً مطابقت دارند (اولویت اول)
+        String exactQuery = "SELECT * FROM " + TABLE_WORDS +
+                " WHERE " + COLUMN_WORD + " = ? " +
+                "ORDER BY " + COLUMN_SEARCH_COUNT + " DESC " +
+                "LIMIT 1";
+
+        Cursor exactCursor = db.rawQuery(exactQuery, new String[]{lowerQuery});
+        while (exactCursor.moveToNext()) {
+            results.add(cursorToWord(exactCursor));
+            updateSearchCount(exactCursor.getString(exactCursor.getColumnIndexOrThrow(COLUMN_WORD)));
+        }
+        exactCursor.close();
+
+        // 2. کلماتی که با عبارت جستجو شروع می‌شوند (اولویت دوم)
+        String startsWithQuery = "SELECT * FROM " + TABLE_WORDS +
+                " WHERE " + COLUMN_WORD + " LIKE ? " +
+                " AND " + COLUMN_WORD + " != ? " +
+                "ORDER BY " + COLUMN_SEARCH_COUNT + " DESC, LENGTH(" + COLUMN_WORD + ") ASC, " + COLUMN_WORD + " ASC " +
+                "LIMIT 20";
+
+        Cursor startsWithCursor = db.rawQuery(startsWithQuery, new String[]{lowerQuery + "%", lowerQuery});
+        while (startsWithCursor.moveToNext()) {
+            results.add(cursorToWord(startsWithCursor));
+            updateSearchCount(startsWithCursor.getString(startsWithCursor.getColumnIndexOrThrow(COLUMN_WORD)));
+        }
+        startsWithCursor.close();
+
+        // 3. کلماتی که شامل عبارت جستجو هستند (اولویت سوم)
+        String containsQuery = "SELECT * FROM " + TABLE_WORDS +
+                " WHERE (" + COLUMN_WORD + " LIKE ? OR " + COLUMN_PERSIAN + " LIKE ?) " +
+                " AND " + COLUMN_WORD + " NOT LIKE ? " +
+                " AND " + COLUMN_WORD + " NOT LIKE ? " +
+                "ORDER BY " + COLUMN_SEARCH_COUNT + " DESC, LENGTH(" + COLUMN_WORD + ") ASC, " + COLUMN_WORD + " ASC " +
+                "LIMIT 30";
+
+        String[] containsArgs = {"%" + lowerQuery + "%", "%" + query + "%", lowerQuery + "%", lowerQuery};
+        Cursor containsCursor = db.rawQuery(containsQuery, containsArgs);
+        while (containsCursor.moveToNext()) {
+            results.add(cursorToWord(containsCursor));
+            updateSearchCount(containsCursor.getString(containsCursor.getColumnIndexOrThrow(COLUMN_WORD)));
+        }
+        containsCursor.close();
+
+        // حذف موارد تکراری (در صورت وجود)
+        ArrayList<HashMap<String, String>> uniqueResults = new ArrayList<>();
+        ArrayList<String> addedWords = new ArrayList<>();
+        for (HashMap<String, String> word : results) {
+            String wordText = word.get("word");
+            if (!addedWords.contains(wordText)) {
+                uniqueResults.add(word);
+                addedWords.add(wordText);
+            }
+        }
+
+        return uniqueResults;
+    }
+
+    // متد کمکی برای تبدیل Cursor به HashMap
+    private HashMap<String, String> cursorToWord(Cursor cursor) {
+        HashMap<String, String> word = new HashMap<>();
+        word.put("word", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_WORD)));
+        word.put("persian", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PERSIAN)));
+        word.put("level", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LEVEL)));
+        word.put("example", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE)));
+        word.put("synonym", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SYNONYM)));
+        word.put("pronunciation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRONUNCIATION)));
+        word.put("example_translation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE_TRANSLATION)));
+        return word;
+    }
     private void updateSearchCount(String word) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("UPDATE " + TABLE_WORDS + " SET " + COLUMN_SEARCH_COUNT +
@@ -226,6 +302,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return words;
+    }
+
+    // دریافت کلمه با تطابق دقیق (برای WordDetailActivity)
+    public HashMap<String, String> getWordByExactMatch(String word) {
+        HashMap<String, String> result = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_WORDS,
+                null,
+                COLUMN_WORD + " = ?",
+                new String[]{word.toLowerCase()},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            result = new HashMap<>();
+            result.put("word", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_WORD)));
+            result.put("persian", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PERSIAN)));
+            result.put("level", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LEVEL)));
+            result.put("example", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE)));
+            result.put("synonym", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SYNONYM)));
+            result.put("pronunciation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRONUNCIATION)));
+            result.put("example_translation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE_TRANSLATION)));
+        }
+        cursor.close();
+
+        return result;
     }
 
     // تعداد کل کلمات
@@ -327,5 +429,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return counts;
+    }
+
+    // دریافت کلمات یاد گرفته شده با جزئیات کامل
+    public ArrayList<HashMap<String, String>> getMasteredWordsWithDetails() {
+        ArrayList<HashMap<String, String>> mastered = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_WORDS,
+                new String[]{COLUMN_WORD, COLUMN_PERSIAN, COLUMN_LEVEL, COLUMN_EXAMPLE, COLUMN_EXAMPLE_TRANSLATION},
+                COLUMN_IS_MASTERED + "=1",
+                null, null, null, COLUMN_WORD + " ASC");
+
+        while (cursor.moveToNext()) {
+            HashMap<String, String> word = new HashMap<>();
+            word.put("word", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_WORD)));
+            word.put("persian", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PERSIAN)));
+            word.put("level", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LEVEL)));
+            word.put("example", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE)));
+            word.put("example_translation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE_TRANSLATION)));
+            mastered.add(word);
+        }
+        cursor.close();
+
+        return mastered;
+    }
+
+    // حذف کلمه از لیست یاد گرفته شده (بازنشانی)
+    public void removeFromMastered(String word) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_IS_MASTERED, 0);
+        db.update(TABLE_WORDS, values, COLUMN_WORD + "=?", new String[]{word});
     }
 }

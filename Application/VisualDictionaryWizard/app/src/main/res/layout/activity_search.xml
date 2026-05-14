@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+    android:layoutDirection="rtl"
     android:background="#f5f5f5">
 
     <!-- طبق مقاله ASO: تجربه کاربری جذاب و ساده = نرخ تبدیل بالاتر -->

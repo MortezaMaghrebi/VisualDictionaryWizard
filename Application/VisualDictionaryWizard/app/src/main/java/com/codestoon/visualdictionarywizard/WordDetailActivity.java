@@ -69,10 +69,11 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void loadWordData() {
-        // جستجوی کلمه در دیتابیس
-        ArrayList<HashMap<String, String>> results = dbHelper.searchWords(currentWord);
-        if (!results.isEmpty()) {
-            wordData = results.get(0);
+        // ✅ استفاده از جستجوی دقیق به جای searchWords
+        HashMap<String, String> wordData = dbHelper.getWordByExactMatch(currentWord);
+
+        if (wordData != null) {
+            this.wordData = wordData;
 
             wordText.setText(wordData.get("word"));
             persianText.setText(wordData.get("persian"));
@@ -82,14 +83,13 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
             exampleTranslationText.setText(wordData.get("example_translation"));
             synonymText.setText(wordData.get("synonym"));
 
-            // تنظیم رنگ سطح (طبق مقاله: نشانه‌های بصری برای UX بهتر)
             setLevelColor(wordData.get("level"));
-
-            // بارگذاری تصویر
             loadImage(wordData.get("word"));
-
-            // بررسی وضعیت علاقه‌مندی
             checkFavoriteStatus();
+        } else {
+            // اگر کلمه پیدا نشد
+            Toast.makeText(this, "کلمه مورد نظر یافت نشد", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 

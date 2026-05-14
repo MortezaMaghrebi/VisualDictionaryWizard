@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VisualDictionaryWizard">
         <activity
+            android:name=".MasteredWordsActivity"
+            android:exported="false" />
+        <activity
             android:name=".LevelWordsActivity"
             android:exported="false" />
         <activity
