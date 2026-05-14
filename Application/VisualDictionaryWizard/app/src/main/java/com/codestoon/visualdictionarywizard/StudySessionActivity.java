@@ -2,7 +2,6 @@ package com.codestoon.visualdictionarywizard;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.animation.Animation;
@@ -28,12 +27,13 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private boolean isShowingMeaning = false;
     private TextToSpeech textToSpeech;
 
+    private boolean isAnimating = false;  // جلوگیری از کلیک همزمان
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study_session);
 
-        // دریافت لیست کلمات از Intent
         studyWords = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("study_words");
         if (studyWords == null || studyWords.isEmpty()) {
             Toast.makeText(this, "کلمه‌ای برای مطالعه وجود ندارد", Toast.LENGTH_SHORT).show();
@@ -47,7 +47,6 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         updateCard();
         updateCounter();
 
-        // TextToSpeech برای تلفظ
         textToSpeech = new TextToSpeech(this, this);
     }
 
@@ -76,29 +75,32 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     }
 
     private void setupClickListeners() {
-        // کلیک روی کارت برای برگرداندن (فلش)
-        flashCard.setOnClickListener(v -> flipCard());
+        flashCard.setOnClickListener(v -> {
+            if (!isAnimating) {
+                flipCard();
+            }
+        });
 
-        // دکمه برگرداندن
-        flipIcon.setOnClickListener(v -> flipCard());
+        flipIcon.setOnClickListener(v -> {
+            if (!isAnimating) {
+                flipCard();
+            }
+        });
 
-        // دکمه تلفظ
         speakIcon.setOnClickListener(v -> {
             String word = studyWords.get(currentIndex).get("word");
             speakWord(word);
         });
 
-        // کلمه بعدی
         nextIcon.setOnClickListener(v -> nextWord());
-
-        // کلمه قبلی
         prevIcon.setOnClickListener(v -> prevWord());
-
-        // خروج از جلسه مطالعه
         exitButton.setOnClickListener(v -> finish());
     }
 
     private void flipCard() {
+        if (isAnimating) return;
+        isAnimating = true;
+
         Animation flipOut = AnimationUtils.loadAnimation(this, R.anim.flip_out);
         Animation flipIn = AnimationUtils.loadAnimation(this, R.anim.flip_in);
 
@@ -123,6 +125,19 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
+
+        flipIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                isAnimating = false;
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
     }
 
     private void showWord() {
@@ -138,15 +153,22 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         wordText.setVisibility(View.GONE);
         meaningText.setVisibility(View.VISIBLE);
 
-        String meaning = currentWord.get("persian");
+        String persian = currentWord.get("persian");
         String example = currentWord.get("example");
+        String exampleTranslation = currentWord.get("example_translation");
+
+        StringBuilder meaning = new StringBuilder();
+        meaning.append(persian);
 
         if (example != null && !example.isEmpty()) {
-            meaningText.setText(meaning + "\n\n📖 " + example);
-        } else {
-            meaningText.setText(meaning);
+            meaning.append("\n\n📖 ").append(example);
         }
 
+        if (exampleTranslation != null && !exampleTranslation.isEmpty()) {
+            meaning.append("\n\n🇮🇷 ").append(exampleTranslation);
+        }
+
+        meaningText.setText(meaning.toString());
         isShowingMeaning = true;
     }
 
@@ -156,14 +178,23 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         // نمایش کلمه
         wordText.setText(currentWord.get("word"));
 
-        // نمایش معنی با مثال
-        String meaning = currentWord.get("persian");
+        // ذخیره معنی در meaningText برای استفاده بعدی
+        String persian = currentWord.get("persian");
         String example = currentWord.get("example");
+        String exampleTranslation = currentWord.get("example_translation");
+
+        StringBuilder meaning = new StringBuilder();
+        meaning.append(persian);
+
         if (example != null && !example.isEmpty()) {
-            meaningText.setText(meaning + "\n\n📖 " + example);
-        } else {
-            meaningText.setText(meaning);
+            meaning.append("\n\n📖 ").append(example);
         }
+
+        if (exampleTranslation != null && !exampleTranslation.isEmpty()) {
+            meaning.append("\n\n🇮🇷 ").append(exampleTranslation);
+        }
+
+        meaningText.setText(meaning.toString());
 
         // سطح
         String level = currentWord.get("level");
@@ -196,11 +227,9 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private void updateCounter() {
         counterText.setText((currentIndex + 1) + " / " + studyWords.size());
 
-        // غیرفعال کردن دکمه قبلی در کلمه اول
         prevIcon.setEnabled(currentIndex > 0);
         prevIcon.setAlpha(currentIndex > 0 ? 1.0f : 0.5f);
 
-        // غیرفعال کردن دکمه بعدی در کلمه آخر
         nextIcon.setEnabled(currentIndex < studyWords.size() - 1);
         nextIcon.setAlpha(currentIndex < studyWords.size() - 1 ? 1.0f : 0.5f);
     }
@@ -215,11 +244,8 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             currentIndex++;
             updateCard();
             updateCounter();
-
-            // انیمیشن اسلاید به چپ
             flashCard.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in_left));
         } else {
-            // اتمام جلسه مطالعه
             Toast.makeText(this, "🎉 تبریک! جلسه مطالعه به پایان رسید", Toast.LENGTH_LONG).show();
             finish();
         }
@@ -230,8 +256,6 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             currentIndex--;
             updateCard();
             updateCounter();
-
-            // انیمیشن اسلاید به راست
             flashCard.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in_right));
         }
     }

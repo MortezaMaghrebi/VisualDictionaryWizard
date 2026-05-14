@@ -163,9 +163,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<HashMap<String, String>> results = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // اضافه کردن مثال و مترادف برای نمایش بهتر
+        // مطمئن شوید example_translation رو هم می‌گیرید
         Cursor cursor = db.query(TABLE_WORDS,
-                new String[]{COLUMN_WORD, COLUMN_PERSIAN, COLUMN_LEVEL, COLUMN_EXAMPLE, COLUMN_SYNONYM},
+                new String[]{COLUMN_WORD, COLUMN_PERSIAN, COLUMN_LEVEL, COLUMN_EXAMPLE, COLUMN_SYNONYM, COLUMN_EXAMPLE_TRANSLATION},
                 COLUMN_LEVEL + "=?",
                 new String[]{level}, null, null, COLUMN_WORD + " ASC");
 
@@ -176,12 +176,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             word.put("level", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LEVEL)));
             word.put("example", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE)));
             word.put("synonym", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SYNONYM)));
+            word.put("example_translation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE_TRANSLATION)));  // ← این خط مهمه
             results.add(word);
         }
         cursor.close();
 
         return results;
     }
+
 
     // افزودن به علاقه‌مندی‌ها (برای افزایش ریتنشن - طبق مقاله)
     public void toggleFavorite(String word) {
@@ -248,12 +250,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return word;
     }
     // دریافت جزئیات کامل علاقه‌مندی‌ها
+    // دریافت جزئیات کامل علاقه‌مندی‌ها
     public ArrayList<HashMap<String, String>> getFavoritesWithDetails() {
         ArrayList<HashMap<String, String>> favorites = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_WORDS,
-                new String[]{COLUMN_WORD, COLUMN_PERSIAN, COLUMN_LEVEL, COLUMN_EXAMPLE},
+                new String[]{COLUMN_WORD, COLUMN_PERSIAN, COLUMN_LEVEL, COLUMN_EXAMPLE, COLUMN_EXAMPLE_TRANSLATION},
                 COLUMN_FAVORITE + "=1",
                 null, null, null, COLUMN_WORD + " ASC");
 
@@ -263,6 +266,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             word.put("persian", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PERSIAN)));
             word.put("level", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LEVEL)));
             word.put("example", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE)));
+            word.put("example_translation", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE_TRANSLATION)));  // ← اضافه شد
             favorites.add(word);
         }
         cursor.close();
