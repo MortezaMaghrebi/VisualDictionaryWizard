@@ -30,6 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_EXAMPLE_TRANSLATION = "example_translation";
     private static final String COLUMN_FAVORITE = "is_favorite";
     private static final String COLUMN_SEARCH_COUNT = "search_count";
+    private static final String COLUMN_IS_MASTERED = "is_mastered";
 
     private Context context;
     private boolean isFirstRun = false;
@@ -52,8 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_PRONUNCIATION + " TEXT, " +
                 COLUMN_EXAMPLE_TRANSLATION + " TEXT, " +
                 COLUMN_FAVORITE + " INTEGER DEFAULT 0, " +
-                COLUMN_SEARCH_COUNT + " INTEGER DEFAULT 0);";
-
+                COLUMN_SEARCH_COUNT + " INTEGER DEFAULT 0, " +
+                COLUMN_IS_MASTERED+ " INTEGER DEFAULT 0);";
         db.execSQL(createTable);
 
         // ایجاد ایندکس برای جستجوی سریع‌تر (طبق مقاله: عملکرد فنی مهمه!)
@@ -273,6 +274,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return favorites;
     }
+
+    // بررسی آیا کلمه در علاقه‌مندی‌ها هست
+    public boolean isFavorite(String word) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_WORDS, new String[]{COLUMN_FAVORITE},
+                COLUMN_WORD + "=?", new String[]{word}, null, null, null);
+        boolean isFavorite = false;
+        if (cursor.moveToFirst()) {
+            isFavorite = cursor.getInt(0) == 1;
+        }
+        cursor.close();
+        return isFavorite;
+    }
+
+    // اضافه کردن به کلمات یاد گرفته شده
+    public void addToMastered(String word) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("is_mastered", 1);
+        db.update(TABLE_WORDS, values, COLUMN_WORD + "=?", new String[]{word});
+    }
+
+    // بررسی آیا کلمه یاد گرفته شده
+    public boolean isMastered(String word) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT is_mastered FROM " + TABLE_WORDS +
+                " WHERE " + COLUMN_WORD + "=?", new String[]{word});
+        boolean isMastered = false;
+        if (cursor.moveToFirst()) {
+            isMastered = cursor.getInt(0) == 1;
+        }
+        cursor.close();
+        return isMastered;
+    }
+
+
     // دریافت تعداد کلمات در هر سطح
     public HashMap<String, Integer> getLevelWordCounts() {
         HashMap<String, Integer> counts = new HashMap<>();

@@ -1,6 +1,8 @@
 package com.codestoon.visualdictionarywizard;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -18,7 +21,7 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
     private CardView flashCard;
     private TextView wordText, meaningText, levelText, counterText;
-    private ImageView speakIcon, nextIcon, prevIcon, flipIcon;
+    private ImageView speakIcon, nextIcon, prevIcon, flipIcon, favoriteIcon, masteredIcon, wordImage;
     private ProgressBar progressBar;
     private Button exitButton;
 
@@ -26,8 +29,9 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private int currentIndex = 0;
     private boolean isShowingMeaning = false;
     private TextToSpeech textToSpeech;
+    private DatabaseHelper dbHelper;
 
-    private boolean isAnimating = false;  // جلوگیری از کلیک همزمان
+    private boolean isAnimating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,8 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             finish();
             return;
         }
+
+        dbHelper = new DatabaseHelper(this);
 
         initViews();
         setupToolbar();
@@ -60,6 +66,9 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         nextIcon = findViewById(R.id.nextIcon);
         prevIcon = findViewById(R.id.prevIcon);
         flipIcon = findViewById(R.id.flipIcon);
+        favoriteIcon = findViewById(R.id.favoriteIcon);
+        masteredIcon = findViewById(R.id.masteredIcon);
+        wordImage = findViewById(R.id.wordImage);
         progressBar = findViewById(R.id.progressBar);
         exitButton = findViewById(R.id.exitButton);
     }
@@ -75,13 +84,20 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     }
 
     private void setupClickListeners() {
-        flashCard.setOnClickListener(v -> {
-            if (!isAnimating) {
-                flipCard();
+        // کلیک روی خود کارت برای چرخاندن
+        flashCard.setOnTouchListener((v, event) -> {
+            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                if (!isAnimating) {
+                    flipCard();
+                }
+                return true;
             }
+            return false;
         });
 
+        // دکمه flip هم برای چرخاندن
         flipIcon.setOnClickListener(v -> {
+            android.util.Log.d("StudySession", "Flip icon clicked!");
             if (!isAnimating) {
                 flipCard();
             }
@@ -92,9 +108,65 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             speakWord(word);
         });
 
+        // حذف از علاقه‌مندی‌ها
+        favoriteIcon.setOnClickListener(v -> {
+            String currentWord = studyWords.get(currentIndex).get("word");
+            new Thread(() -> {
+                dbHelper.toggleFavorite(currentWord);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "❌ " + currentWord + " از علاقه‌مندی‌ها حذف شد", Toast.LENGTH_SHORT).show();
+                    favoriteIcon.setVisibility(View.GONE);
+                });
+            }).start();
+        });
+
+        // اضافه کردن به کلمات یاد گرفته شده
+        masteredIcon.setOnClickListener(v -> {
+            String currentWord = studyWords.get(currentIndex).get("word");
+            new Thread(() -> {
+                dbHelper.addToMastered(currentWord);  // متد جدید
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "🎉 " + currentWord + " به کلمات یاد گرفته شده اضافه شد", Toast.LENGTH_SHORT).show();
+                    masteredIcon.setEnabled(false);
+                    masteredIcon.setAlpha(0.5f);
+
+                    // حذف از لیست مطالعه فعلی
+                    studyWords.remove(currentIndex);
+                    if (studyWords.isEmpty()) {
+                        Toast.makeText(this, "🎊 تبریک! همه کلمات رو یاد گرفتی!", Toast.LENGTH_LONG).show();
+                        finish();
+                    } else {
+                        if (currentIndex >= studyWords.size()) {
+                            currentIndex = studyWords.size() - 1;
+                        }
+                        updateCard();
+                        updateCounter();
+                    }
+                });
+            }).start();
+        });
+
         nextIcon.setOnClickListener(v -> nextWord());
         prevIcon.setOnClickListener(v -> prevWord());
         exitButton.setOnClickListener(v -> finish());
+    }
+
+    private void loadImage(String wordName) {
+        try {
+            String imagePath = "pictures/" + wordName.toLowerCase() + ".jpg";
+            InputStream is = getAssets().open(imagePath);
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            wordImage.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            try {
+                String imagePath = "pictures/" + wordName.toLowerCase() + ".png";
+                InputStream is = getAssets().open(imagePath);
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                wordImage.setImageBitmap(bitmap);
+            } catch (Exception e2) {
+                wordImage.setImageResource(R.drawable.ic_no_image);
+            }
+        }
     }
 
     private void flipCard() {
@@ -112,13 +184,11 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                // تغییر محتوا
                 if (isShowingMeaning) {
                     showWord();
                 } else {
                     showMeaning();
                 }
-
                 flashCard.startAnimation(flipIn);
             }
 
@@ -175,10 +245,13 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private void updateCard() {
         HashMap<String, String> currentWord = studyWords.get(currentIndex);
 
+        // نمایش تصویر
+        loadImage(currentWord.get("word"));
+
         // نمایش کلمه
         wordText.setText(currentWord.get("word"));
 
-        // ذخیره معنی در meaningText برای استفاده بعدی
+        // ذخیره معنی
         String persian = currentWord.get("persian");
         String example = currentWord.get("example");
         String exampleTranslation = currentWord.get("example_translation");
@@ -206,8 +279,41 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         meaningText.setVisibility(View.GONE);
         isShowingMeaning = false;
 
-        // به‌روزرسانی نوار پیشرفت
+        // بررسی وضعیت علاقه‌مندی
+        checkFavoriteStatus(currentWord.get("word"));
+
+        // بررسی وضعیت یادگیری
+        checkMasteredStatus(currentWord.get("word"));
+
         updateProgress();
+    }
+
+    private void checkFavoriteStatus(String word) {
+        new Thread(() -> {
+            boolean isFavorite = dbHelper.isFavorite(word);
+            runOnUiThread(() -> {
+                if (isFavorite) {
+                    favoriteIcon.setVisibility(View.VISIBLE);
+                } else {
+                    favoriteIcon.setVisibility(View.GONE);
+                }
+            });
+        }).start();
+    }
+
+    private void checkMasteredStatus(String word) {
+        new Thread(() -> {
+            boolean isMastered = dbHelper.isMastered(word);
+            runOnUiThread(() -> {
+                if (isMastered) {
+                    masteredIcon.setEnabled(false);
+                    masteredIcon.setAlpha(0.5f);
+                } else {
+                    masteredIcon.setEnabled(true);
+                    masteredIcon.setAlpha(1.0f);
+                }
+            });
+        }).start();
     }
 
     private void setLevelColor(String level) {

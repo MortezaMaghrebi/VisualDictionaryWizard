@@ -13,7 +13,6 @@
         android:background="#16213e"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <!-- نوار پیشرفت -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
@@ -29,9 +28,8 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="24dp">
+        android:padding="16dp">
 
-        <!-- شمارنده -->
         <TextView
             android:id="@+id/counterText"
             android:layout_width="wrap_content"
@@ -39,69 +37,96 @@
             android:text="1 / 10"
             android:textSize="14sp"
             android:textColor="#888888"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="8dp" />
 
-        <!-- فلش کارت اصلی -->
         <androidx.cardview.widget.CardView
             android:id="@+id/flashCard"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             app:cardCornerRadius="24dp"
             app:cardElevation="12dp"
             app:cardBackgroundColor="#FFFFFF"
             android:foreground="?attr/selectableItemBackground">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="24dp">
 
-                <!-- سطح کلمه -->
-                <TextView
-                    android:id="@+id/levelText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="B2"
-                    android:textSize="12sp"
-                    android:textColor="#FFFFFF"
-                    android:padding="6dp"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    app:cardCornerRadius="16dp" />
-
-                <!-- کلمه انگلیسی -->
-                <TextView
-                    android:id="@+id/wordText"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Example"
-                    android:textSize="32sp"
-                    android:textStyle="bold"
-                    android:textColor="#2c3e50"
-                    android:gravity="center"
-                    android:layout_centerInParent="true" />
+                    android:padding="16dp"
+                    android:clickable="false"
+                    android:focusable="false">
 
-                <!-- معنی فارسی با مثال -->
-                <TextView
-                    android:id="@+id/meaningText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="مثال\n\n📖 This is an example"
-                    android:textSize="18sp"
-                    android:textColor="#555555"
-                    android:gravity="center"
-                    android:layout_centerInParent="true"
-                    android:visibility="gone"
-                    android:lineSpacingExtra="6dp" />
+                    <!-- سطح کلمه -->
+                    <TextView
+                        android:id="@+id/levelText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="B2"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        android:padding="6dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:clickable="false"
+                        android:focusable="false"
+                        app:cardCornerRadius="16dp" />
 
-            </RelativeLayout>
+                    <!-- تصویر کلمه -->
+                    <ImageView
+                        android:id="@+id/wordImage"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_below="@id/levelText"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_no_image"
+                        android:clickable="false"
+                        android:focusable="false"
+                        app:cardCornerRadius="12dp" />
+
+                    <!-- کلمه انگلیسی -->
+                    <TextView
+                        android:id="@+id/wordText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Example"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="#2c3e50"
+                        android:gravity="center"
+                        android:layout_below="@id/wordImage"
+                        android:layout_marginTop="16dp"
+                        android:clickable="false"
+                        android:focusable="false" />
+
+                    <!-- معنی فارسی با مثال -->
+                    <TextView
+                        android:id="@+id/meaningText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="مثال\n\n📖 This is an example"
+                        android:textSize="16sp"
+                        android:textColor="#555555"
+                        android:gravity="center"
+                        android:layout_below="@id/wordText"
+                        android:layout_marginTop="16dp"
+                        android:visibility="gone"
+                        android:lineSpacingExtra="6dp"
+                        android:clickable="false"
+                        android:focusable="false" />
+
+                </RelativeLayout>
+
+
 
         </androidx.cardview.widget.CardView>
 
-        <!-- راهنما -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -118,17 +143,27 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:padding="24dp"
+        android:padding="16dp"
         android:background="#16213e">
 
         <ImageButton
             android:id="@+id/prevIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_prev"
             android:background="@drawable/circle_background_dark"
-            android:tint="#FFFFFF"
-            android:layout_marginEnd="16dp" />
+            app:tint="#FFFFFF"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/favoriteIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_favorite_filled"
+            android:background="@drawable/circle_background_dark"
+            app:tint="#E74C3C"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
 
         <ImageButton
             android:id="@+id/flipIcon"
@@ -136,39 +171,48 @@
             android:layout_height="56dp"
             android:src="@drawable/ic_flip"
             android:background="@drawable/circle_background_accent"
-            android:tint="#FFFFFF"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
+            app:tint="#FFFFFF"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
 
         <ImageButton
             android:id="@+id/speakIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_speaker"
             android:background="@drawable/circle_background_dark"
-            android:tint="#FFFFFF"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
+            app:tint="#FFFFFF"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <ImageButton
+            android:id="@+id/masteredIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_mastered"
+            android:background="@drawable/circle_background_dark"
+            app:tint="#4CAF50"
+            android:layout_marginStart="8dp" />
 
         <ImageButton
             android:id="@+id/nextIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@drawable/ic_next"
             android:background="@drawable/circle_background_dark"
-            android:tint="#FFFFFF"
-            android:layout_marginStart="16dp" />
+            app:tint="#FFFFFF"
+            android:layout_marginStart="8dp" />
 
     </LinearLayout>
 
-    <!-- دکمه خروج -->
     <Button
         android:id="@+id/exitButton"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
+        android:layout_height="44dp"
+        android:layout_margin="12dp"
         android:text="🚪 خروج از جلسه مطالعه"
         android:background="@drawable/button_outline"
-        android:textColor="#FF6B6B" />
+        android:textColor="#FF6B6B"
+        android:textSize="12sp" />
 
 </LinearLayout>
