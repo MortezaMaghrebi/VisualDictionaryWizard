@@ -163,7 +163,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<HashMap<String, String>> results = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_WORDS, null, COLUMN_LEVEL + "=?",
+        // اضافه کردن مثال و مترادف برای نمایش بهتر
+        Cursor cursor = db.query(TABLE_WORDS,
+                new String[]{COLUMN_WORD, COLUMN_PERSIAN, COLUMN_LEVEL, COLUMN_EXAMPLE, COLUMN_SYNONYM},
+                COLUMN_LEVEL + "=?",
                 new String[]{level}, null, null, COLUMN_WORD + " ASC");
 
         while (cursor.moveToNext()) {
@@ -171,6 +174,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             word.put("word", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_WORD)));
             word.put("persian", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PERSIAN)));
             word.put("level", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LEVEL)));
+            word.put("example", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXAMPLE)));
+            word.put("synonym", cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SYNONYM)));
             results.add(word);
         }
         cursor.close();

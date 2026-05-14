@@ -19,6 +19,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
     private String[] levelNames;
     private String[] levelDescriptions;
     private int[] levelColors;
+
     private int[] levelIcons;
     private OnLevelClickListener listener;
 

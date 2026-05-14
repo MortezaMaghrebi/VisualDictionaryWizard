@@ -16,6 +16,9 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
     private ArrayList<HashMap<String, String>> words;
     private OnWordClickListener listener;
 
+    private int[] levelColors;
+
+
     public interface OnWordClickListener {
         void onWordClick(HashMap<String, String> word);
     }
@@ -23,6 +26,14 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
     public WordAdapter(ArrayList<HashMap<String, String>> words, OnWordClickListener listener) {
         this.words = words;
         this.listener = listener;
+        this.levelColors = new int[]{
+                0xFF4CAF50,  // A1 - سبز
+                0xFF8BC34A,  // A2 - سبز روشن
+                0xFFFF9800,  // B1 - نارنجی
+                0xFFFFC107,  // B2 - زرد کهربایی
+                0xFFF44336,  // C1 - قرمز
+                0xFF9C27B0   // C2 - بنفش
+        };
     }
 
     @NonNull
@@ -45,14 +56,12 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
         holder.levelText.setText(level);
 
         // رنگ‌بندی سطح طبق CEFR
-        if (level.equals("A1") || level.equals("A2")) {
-            holder.levelText.setBackgroundColor(0xFF4CAF50); // سبز برای مبتدی
-        } else if (level.equals("B1") || level.equals("B2")) {
-            holder.levelText.setBackgroundColor(0xFFFF9800); // نارنجی برای متوسط
-        } else {
-            holder.levelText.setBackgroundColor(0xFFF44336); // قرمز برای پیشرفته
-        }
-
+        if(level.equals("A1")) holder.levelText.setBackgroundColor(this.levelColors[0]);
+        else if(level.equals("A2")) holder.levelText.setBackgroundColor(this.levelColors[1]);
+        else if(level.equals("B1")) holder.levelText.setBackgroundColor(this.levelColors[2]);
+        else if(level.equals("B2")) holder.levelText.setBackgroundColor(this.levelColors[3]);
+        else if(level.equals("C1")) holder.levelText.setBackgroundColor(this.levelColors[4]);
+        else if(level.equals("C2")) holder.levelText.setBackgroundColor(this.levelColors[5]);
         holder.cardView.setOnClickListener(v -> listener.onWordClick(word));
     }
 

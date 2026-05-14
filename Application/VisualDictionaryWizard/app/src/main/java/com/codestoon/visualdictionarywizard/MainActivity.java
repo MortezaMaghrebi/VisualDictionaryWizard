@@ -51,15 +51,13 @@ public class MainActivity extends AppCompatActivity {
     // ✅ اصلاح شده: این متد رو جداگانه نوشتم
     private void setupLevelRecyclerView() {
         LevelAdapter levelAdapter = new LevelAdapter(levels, levelNames, (level, levelName) -> {
-            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-            intent.putExtra("filter_level", level);
-            intent.putExtra("filter_level_name", levelName);
+            // رفتن به صفحه کلمات سطح
+            Intent intent = new Intent(MainActivity.this, LevelWordsActivity.class);
+            intent.putExtra("level", level);
+            intent.putExtra("level_name", levelName);
             startActivity(intent);
-
-            Toast.makeText(this, "سطح " + level + " - " + levelName, Toast.LENGTH_SHORT).show();
         });
 
-        // دریافت تعداد کلمات هر سطح از دیتابیس
         new Thread(() -> {
             HashMap<String, Integer> levelCounts = dbHelper.getLevelWordCounts();
             runOnUiThread(() -> {
