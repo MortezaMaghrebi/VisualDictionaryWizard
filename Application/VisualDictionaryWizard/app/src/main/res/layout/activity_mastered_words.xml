@@ -142,13 +142,15 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="12dp"
+        android:layoutDirection="ltr"
         android:background="#FFFFFF"
         android:elevation="8dp">
+
 
         <Button
             android:id="@+id/resetButton"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="54dp"
             android:layout_weight="1"
             android:text="🔄 بازنشانی"
             android:background="@drawable/button_outline_danger"
@@ -158,7 +160,7 @@
         <Button
             android:id="@+id/studyButton"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="54dp"
             android:layout_weight="1.5"
             android:text="📖 شروع مطالعه"
             android:background="@drawable/button_primary"

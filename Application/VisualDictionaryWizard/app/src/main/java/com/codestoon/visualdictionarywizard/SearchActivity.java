@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -51,8 +52,26 @@ public class SearchActivity extends AppCompatActivity {
             searchEditText.setText(filterLevel);
             performSearch(filterLevel);
         }
+
+        // ✅ نمایش خودکار کیبورد
+        showKeyboard();
+    }
+    // ✅ متد نمایش کیبورد
+    private void showKeyboard() {
+        searchEditText.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 
+    // ✅ متد مخفی کردن کیبورد (اختیاری - می‌توانید در onPause اضافه کنید)
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getCurrentFocus() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
     private void initViews() {
         searchEditText = findViewById(R.id.searchEditText);
         recyclerView = findViewById(R.id.recyclerView);

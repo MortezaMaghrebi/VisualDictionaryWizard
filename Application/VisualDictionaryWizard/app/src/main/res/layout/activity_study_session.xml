@@ -179,74 +179,130 @@
 
     </LinearLayout>
 
-    <!-- دکمه‌های کنترل -->
-    <LinearLayout
+    <!-- دکمه‌های کنترل - دایره‌ای و ریسپانسیو -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:layout_height="130dp"
         android:padding="16dp"
         android:layoutDirection="ltr"
         android:background="#16213e">
 
+        <!-- دکمه قبلی (بزرگ) -->
+
+        <!-- دکمه علاقه‌مندی -->
+
+        <!-- دکمه برگرداندن (بزرگترین) -->
+
+        <!-- دکمه تلفظ -->
+
+        <!-- دکمه یادگرفته شده -->
+
+        <!-- دکمه بعدی (بزرگ) -->
+
         <ImageButton
             android:id="@+id/prevIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/circle_button_prev"
+            android:padding="10dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_prev"
-            android:background="@drawable/circle_background_dark"
-            app:tint="#FFFFFF"
-            android:layout_marginEnd="8dp" />
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintWidth_percent="0.14" />
 
         <ImageButton
             android:id="@+id/favoriteIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/circle_button_favorite"
+            android:padding="8dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_favorite_filled"
-            android:background="@drawable/circle_background_dark"
-            app:tint="#E74C3C"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp" />
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/prevIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintWidth_percent="0.12" />
 
         <ImageButton
             android:id="@+id/flipIcon"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/circle_button_flip"
+            android:padding="8dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_flip"
-            android:background="@drawable/circle_background_accent"
-            app:tint="#FFFFFF"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp" />
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/favoriteIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintWidth_percent="0.16" />
 
         <ImageButton
             android:id="@+id/speakIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/circle_button_speak"
+            android:padding="8dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_speaker"
-            android:background="@drawable/circle_background_dark"
-            app:tint="#FFFFFF"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp" />
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/flipIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.12" />
 
         <ImageButton
             android:id="@+id/masteredIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/circle_button_mastered"
+            android:padding="8dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_mastered"
-            android:background="@drawable/circle_background_dark"
-            app:tint="#4CAF50"
-            android:layout_marginStart="8dp" />
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@id/speakIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintWidth_percent="0.12" />
 
         <ImageButton
             android:id="@+id/nextIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/circle_button_next"
+            android:padding="8dp"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_next"
-            android:background="@drawable/circle_background_dark"
-            app:tint="#FFFFFF"
-            android:layout_marginStart="8dp" />
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.416"
+            app:layout_constraintStart_toEndOf="@id/masteredIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            app:layout_constraintWidth_percent="0.14" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/exitButton"

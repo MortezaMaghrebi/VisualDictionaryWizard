@@ -115,9 +115,14 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             String currentWord = studyWords.get(currentIndex).get("word");
             new Thread(() -> {
                 dbHelper.toggleFavorite(currentWord);
+                isFavorite = dbHelper.isFavorite(currentWord);
                 runOnUiThread(() -> {
                     //Toast.makeText(this, "❌ " + currentWord + " از علاقه‌مندی‌ها حذف شد", Toast.LENGTH_SHORT).show();
-                    favoriteIcon.setVisibility(View.GONE);
+                     if (isFavorite) {
+                        favoriteIcon.setImageResource(R.drawable.ic_favorite_filled);
+                    } else {
+                        favoriteIcon.setImageResource(R.drawable.ic_empty_favorites);
+                    }
                 });
             }).start();
         });
@@ -296,15 +301,15 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
         updateProgress();
     }
-
+    boolean isFavorite;
     private void checkFavoriteStatus(String word) {
         new Thread(() -> {
-            boolean isFavorite = dbHelper.isFavorite(word);
+            isFavorite = dbHelper.isFavorite(word);
             runOnUiThread(() -> {
                 if (isFavorite) {
-                    favoriteIcon.setVisibility(View.VISIBLE);
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_filled);
                 } else {
-                    favoriteIcon.setVisibility(View.GONE);
+                    favoriteIcon.setImageResource(R.drawable.ic_empty_favorites);
                 }
             });
         }).start();
