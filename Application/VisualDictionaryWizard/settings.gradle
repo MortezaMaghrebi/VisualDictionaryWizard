@@ -25,5 +25,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Visual Dictionary Wizard"
+rootProject.name = "Dictionary Wizard"
 include ':app'

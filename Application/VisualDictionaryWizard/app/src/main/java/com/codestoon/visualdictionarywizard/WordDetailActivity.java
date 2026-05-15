@@ -131,11 +131,16 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void checkFavoriteStatus() {
-        // طبق مقاله: بررسی وضعیت علاقه‌مندی از دیتابیس
-        // این متد باید در DatabaseHelper اضافه شود
-        isFavorite = false; // بعداً از دیتابیس بخوانید
-        updateFavoriteIcon();
+        // بررسی وضعیت علاقه‌مندی از دیتابیس
+        new Thread(() -> {
+            boolean favorite = dbHelper.isFavorite(wordData.get("word"));
+            runOnUiThread(() -> {
+                isFavorite = favorite;
+                updateFavoriteIcon();
+            });
+        }).start();
     }
+
 
     private void setupFavoriteButton() {
         favoriteIcon.setOnClickListener(v -> {
@@ -144,9 +149,9 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
             updateFavoriteIcon();
 
             // طبق مقاله: بازخورد لمسی برای تجربه کاربری بهتر
-            Toast.makeText(this,
-                    isFavorite ? "به علاقه‌مندی‌ها اضافه شد" : "از علاقه‌مندی‌ها حذف شد",
-                    Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,
+            //        isFavorite ? "به علاقه‌مندی‌ها اضافه شد" : "از علاقه‌مندی‌ها حذف شد",
+            //        Toast.LENGTH_SHORT).show();
         });
     }
 

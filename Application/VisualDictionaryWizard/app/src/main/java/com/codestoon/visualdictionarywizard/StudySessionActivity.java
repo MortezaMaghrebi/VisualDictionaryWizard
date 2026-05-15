@@ -116,23 +116,22 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             new Thread(() -> {
                 dbHelper.toggleFavorite(currentWord);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "❌ " + currentWord + " از علاقه‌مندی‌ها حذف شد", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "❌ " + currentWord + " از علاقه‌مندی‌ها حذف شد", Toast.LENGTH_SHORT).show();
                     favoriteIcon.setVisibility(View.GONE);
                 });
             }).start();
         });
 
-        // اضافه کردن به کلمات یاد گرفته شده
         masteredIcon.setOnClickListener(v -> {
             String currentWord = studyWords.get(currentIndex).get("word");
             new Thread(() -> {
-                dbHelper.addToMastered(currentWord);  // متد جدید
+                dbHelper.addToMastered(currentWord);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "🎉 " + currentWord + " به کلمات یاد گرفته شده اضافه شد", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "🎉 " + currentWord + " به کلمات یاد گرفته شده اضافه شد", Toast.LENGTH_SHORT).show();
                     masteredIcon.setEnabled(false);
                     masteredIcon.setAlpha(0.5f);
 
-                    // حذف از لیست مطالعه فعلی
+                    // ✅ این قسمت کلمه رو از لیست مطالعه حذف میکنه
                     studyWords.remove(currentIndex);
                     if (studyWords.isEmpty()) {
                         Toast.makeText(this, "🎊 تبریک! همه کلمات رو یاد گرفتی!", Toast.LENGTH_LONG).show();
@@ -170,6 +169,10 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             }
         }
     }
+
+
+
+
 
     private void flipCard() {
         if (isAnimating) return;

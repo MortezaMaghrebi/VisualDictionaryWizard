@@ -28,7 +28,7 @@
 
         <!-- نام سطح (A1, A2, ...) -->
         <TextView
-            android:id="@+id/levelText"
+             android:id="@+id/levelText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="A1"
@@ -39,6 +39,7 @@
 
         <!-- نام خواندنی سطح (مبتدی 1) -->
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/levelNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,6 +50,7 @@
 
         <!-- توضیحات سطح -->
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/levelDescriptionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,6 +63,7 @@
 
         <!-- تعداد کلمات -->
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/wordCountText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,6 +91,7 @@
                 android:progressBackgroundTint="#80FFFFFF" />
 
             <TextView
+            android:fontFamily="@font/yekan"
                 android:id="@+id/progressText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

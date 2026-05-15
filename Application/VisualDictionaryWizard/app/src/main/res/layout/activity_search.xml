@@ -45,6 +45,7 @@
 
     <!-- جستجوهای اخیر - طبق مقاله برای افزایش ریتنشن -->
     <TextView
+            android:fontFamily="@font/yekan"
         android:id="@+id/recentSearchesLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,6 +70,7 @@
         android:layout_marginTop="8dp"/>
 
     <TextView
+            android:fontFamily="@font/yekan"
         android:id="@+id/emptyView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showWelcomeMessage() {
-        String[] greetings = {"سلام! وقت بخیر", "به دیکشنری تصویری خوش آمدید", "آماده یادگیری ای؟"};
+        String[] greetings = { "به دیکشنری تصویری خوش آمدید", "آماده یادگیری ای؟"};
         int randomIndex = (int) (Math.random() * greetings.length);
         welcomeText.setText(greetings[randomIndex]);
     }
@@ -91,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             int count = dbHelper.getWordCount();
             runOnUiThread(() -> {
-                wordCountText.setText("📚 " + count + " کلمه");
+                if(count>0) {
+                    wordCountText.setText("📚 " + count + " کلمه");
+                }else wordCountText.setText("📚 " + 34520 + " کلمه");
             });
         }).start();
     }

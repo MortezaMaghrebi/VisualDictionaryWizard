@@ -319,16 +319,47 @@ public class FavoritesActivity extends AppCompatActivity {
         ArrayList<HashMap<String, String>> wordsToStudy;
 
         if (isSelectionMode && favoriteAdapter != null && currentSelectedCount > 0) {
+            // مطالعه کلمات منتخب - فقط کلماتی که یاد گرفته نشدن
             wordsToStudy = new ArrayList<>();
             for (int pos : favoriteAdapter.getSelectedPositions()) {
-                wordsToStudy.add(favoritesList.get(pos));
+                HashMap<String, String> word = favoritesList.get(pos);
+                // بررسی نکردن یادگرفته شده برای کلمات منتخب (کاربر خودش انتخاب کرده)
+                wordsToStudy.add(word);
             }
         } else {
-            wordsToStudy = new ArrayList<>(favoritesList);
+            // مطالعه همه کلمات علاقه‌مندی - فقط کلماتی که یاد گرفته نشدن
+            wordsToStudy = new ArrayList<>();
+            for (HashMap<String, String> word : favoritesList) {
+                String currentWord = word.get("word");
+                // بررسی آیا کلمه یاد گرفته شده
+                boolean isMastered = dbHelper.isMastered(currentWord);
+                if (!isMastered) {
+                    wordsToStudy.add(word);
+                }
+            }
         }
 
         if (wordsToStudy.isEmpty()) {
-            Toast.makeText(this, "کلمه‌ای برای مطالعه انتخاب نشده", Toast.LENGTH_SHORT).show();
+            String message;
+            if (!isSelectionMode) {
+                message = "همه کلمات علاقه‌مندی شما قبلاً یاد گرفته شده‌اند!\nاز صفحه کلمات یادگرفته شده می‌توانید مرور کنید.";
+            } else {
+                message = "کلمه‌ای برای مطالعه انتخاب نشده";
+            }
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+            // اگر همه کلمات یاد گرفته شده بودن، پیشنهاد رفتن به صفحه یادگرفته شده‌ها
+            if (!isSelectionMode && !wordsToStudy.isEmpty()) {
+                new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("🎉 همه کلمات رو یاد گرفتی!")
+                        .setMessage("تمام کلمات علاقه‌مندی شما قبلاً یاد گرفته شده‌اند.\nمی‌خواهید کلمات یادگرفته شده را مرور کنید؟")
+                        .setPositiveButton("مشاهده", (dialog, which) -> {
+                            Intent intent = new Intent(FavoritesActivity.this, MasteredWordsActivity.class);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton("بعداً", null)
+                        .show();
+            }
             return;
         }
 

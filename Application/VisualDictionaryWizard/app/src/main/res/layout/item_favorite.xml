@@ -27,6 +27,7 @@
 
         <!-- کلمه انگلیسی -->
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/wordText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,6 +41,7 @@
 
         <!-- معنی فارسی -->
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/persianText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +64,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"/>
         <!-- سطح -->
         <TextView
-            android:id="@+id/levelText"
+             android:id="@+id/levelText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"

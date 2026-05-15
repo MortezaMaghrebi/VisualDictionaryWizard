@@ -32,6 +32,7 @@
         android:padding="16dp">
 
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/counterText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -78,6 +79,7 @@
 
                 <!-- کلمه انگلیسی (سمت اول کارت) -->
                 <TextView
+            android:fontFamily="@font/yekan"
                     android:id="@+id/wordText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -122,6 +124,7 @@
 
                         <!-- معنی فارسی -->
                         <TextView
+            android:fontFamily="@font/yekan"
                             android:id="@+id/meaningText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -134,6 +137,7 @@
 
                         <!-- مثال انگلیسی -->
                         <TextView
+            android:fontFamily="@font/yekan"
                             android:id="@+id/exampleText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -146,6 +150,7 @@
 
                         <!-- ترجمه مثال -->
                         <TextView
+            android:fontFamily="@font/yekan"
                             android:id="@+id/exampleTranslationText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -164,6 +169,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
+            android:fontFamily="@font/yekan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="👆 برای دیدن معنی روی کارت ضربه بزنید"

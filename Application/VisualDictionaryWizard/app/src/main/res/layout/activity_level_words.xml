@@ -24,6 +24,7 @@
         android:background="@drawable/gradient_background">
 
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/levelTitleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,6 +34,7 @@
             android:textColor="#FFFFFF" />
 
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/wordCountText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -96,6 +98,7 @@
 
     <!-- حالت خالی -->
     <TextView
+            android:fontFamily="@font/yekan"
         android:id="@+id/emptyView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

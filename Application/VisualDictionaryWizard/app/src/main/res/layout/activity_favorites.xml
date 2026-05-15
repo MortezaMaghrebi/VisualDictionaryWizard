@@ -24,6 +24,7 @@
         android:elevation="2dp">
 
         <TextView
+            android:fontFamily="@font/yekan"
             android:id="@+id/statsText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,6 +51,7 @@
         android:clipToPadding="false"/>
 
     <TextView
+            android:fontFamily="@font/yekan"
         android:id="@+id/emptyView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -90,6 +92,7 @@
                 app:tint="#E74C3C" />
 
             <TextView
+            android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/clearButtonText"
@@ -120,6 +123,7 @@
                 app:tint="#27AE60" />
 
             <TextView
+            android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/shareButtonText"
@@ -150,6 +154,7 @@
                 app:tint="#3498db" />
 
             <TextView
+            android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/studyButtonText"
