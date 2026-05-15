@@ -91,8 +91,8 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
         holder.levelDescriptionText.setText(description);
 
         // تنظیم آیکون
-        holder.levelIcon.setImageResource(icon);
-        holder.levelIcon.setColorFilter(color);
+        //holder.levelIcon.setImageResource(icon);
+        //holder.levelIcon.setColorFilter(color);
 
         // تنظیم رنگ‌های کارت
         holder.cardView.setCardBackgroundColor(color);
@@ -208,7 +208,7 @@ public class LevelAdapter extends RecyclerView.Adapter<LevelAdapter.ViewHolder> 
             levelDescriptionText = itemView.findViewById(R.id.levelDescriptionText);
             wordCountText = itemView.findViewById(R.id.wordCountText);
             progressText = itemView.findViewById(R.id.progressText);
-            levelIcon = itemView.findViewById(R.id.levelIcon);
+
             progressBar = itemView.findViewById(R.id.progressBar);
         }
     }

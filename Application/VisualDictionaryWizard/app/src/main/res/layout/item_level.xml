@@ -4,102 +4,90 @@
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    android:layoutDirection="ltr"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="3dp"
     android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="25dp"
+        android:paddingBottom="25dp"
         android:gravity="center">
 
-        <!-- آیکون سطح -->
-        <ImageView
-            android:id="@+id/levelIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_level_a1"
-            app:tint="#FFFFFF"
-            android:layout_marginBottom="12dp" />
 
-        <!-- نام سطح (A1, A2, ...) -->
         <TextView
-             android:id="@+id/levelText"
+            android:id="@+id/levelText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="A1"
-            android:textSize="28sp"
+            android:textSize="25dp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             android:letterSpacing="0.05" />
 
-        <!-- نام خواندنی سطح (مبتدی 1) -->
         <TextView
             android:fontFamily="@font/yekan"
             android:id="@+id/levelNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="مبتدی 1"
-            android:textSize="14sp"
+            android:textSize="14dp"
             android:textColor="#FFFFFF"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="2dp" />
 
-        <!-- توضیحات سطح -->
         <TextView
             android:fontFamily="@font/yekan"
             android:id="@+id/levelDescriptionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="کلمات پایه و روزمره"
-            android:textSize="11sp"
+            android:text="کلمات پایه"
+            android:textSize="12dp"
             android:textColor="#E0E0E0"
             android:gravity="center"
-            android:layout_marginTop="8dp"
-            android:paddingHorizontal="8dp" />
+            android:layout_marginTop="4dp" />
 
-        <!-- تعداد کلمات -->
         <TextView
             android:fontFamily="@font/yekan"
             android:id="@+id/wordCountText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📚 0 کلمه"
-            android:textSize="11sp"
+            android:text="0"
+            android:textSize="12dp"
             android:textColor="#E0E0E0"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:visibility="gone" />
 
-        <!-- نوار پیشرفت یادگیری -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:visibility="gone">
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="4dp"
+                android:layout_height="3dp"
                 android:progress="0"
                 android:progressTint="#FFFFFF"
                 android:progressBackgroundTint="#80FFFFFF" />
 
             <TextView
-            android:fontFamily="@font/yekan"
+                android:fontFamily="@font/yekan"
                 android:id="@+id/progressText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0%"
-                android:textSize="10sp"
+                android:textSize="11dp"
                 android:textColor="#FFFFFF"
                 android:layout_gravity="end"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="2dp" />
 
         </LinearLayout>
 

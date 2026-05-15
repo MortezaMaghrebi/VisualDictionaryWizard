@@ -462,4 +462,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IS_MASTERED, 0);
         db.update(TABLE_WORDS, values, COLUMN_WORD + "=?", new String[]{word});
     }
+
+
 }
