@@ -81,6 +81,7 @@
         android:visibility="gone"/>
 
     <!-- دکمه‌های پایین (طراحی جدید) -->
+    <!-- دکمه‌های پایین (طراحی جدید با دکمه سایر اپ‌ها) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -234,6 +235,83 @@
                 android:layout_marginTop="6dp" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/otherAppsButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_button_bg_other">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_other_apps"
+                    android:tint="#FFFFFF" />
+
+            </FrameLayout>
+
+            <TextView
+                android:fontFamily="@font/yekan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="سایر اپ‌ها"
+                android:textSize="11sp"
+                android:textColor="#FF9800"
+                android:layout_marginTop="6dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- بنر تبلیغاتی (فقط برای کاربران رایگان) -->
+    <LinearLayout
+        android:id="@+id/bannerAdLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:elevation="4dp"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_crown"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:fontFamily="@font/yekan"
+            android:id="@+id/bannerAdText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="نسخه پریمیوم: فلش‌کارت نامحدود + حذف تبلیغات"
+            android:textSize="13sp"
+            android:textColor="#2c3e50" />
+
+        <TextView
+            android:fontFamily="@font/yekan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="مشاهده"
+            android:textColor="#3498db"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
 
     </LinearLayout>
 

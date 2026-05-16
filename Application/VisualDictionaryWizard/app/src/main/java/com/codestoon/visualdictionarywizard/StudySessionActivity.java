@@ -1,8 +1,6 @@
 package com.codestoon.visualdictionarywizard;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
@@ -12,7 +10,6 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -35,19 +32,27 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private boolean isAnimating = false;
     private ImageLoader imageLoader;
 
+    private AppPrefsManager prefsManager;
+    private int flashcardsStudiedThisSession = 0;
+    private boolean isPremium = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study_session);
+
         imageLoader = ImageLoader.getInstance(this);
+        dbHelper = new DatabaseHelper(this);
+        prefsManager = AppPrefsManager.getInstance(this);
+        isPremium = prefsManager.isPremium();
+
         studyWords = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("study_words");
+
         if (studyWords == null || studyWords.isEmpty()) {
             Toast.makeText(this, "کلمه‌ای برای مطالعه وجود ندارد", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-
-        dbHelper = new DatabaseHelper(this);
 
         initViews();
         setupToolbar();
@@ -83,23 +88,19 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("📖 جلسه مطالعه");
+            getSupportActionBar().setTitle(isPremium ? "📖 جلسه مطالعه (نامحدود)" : "📖 جلسه مطالعه");
         }
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupClickListeners() {
-        // کلیک روی خود کارت برای چرخاندن
         flashCard.setOnClickListener(v -> {
-            //android.util.Log.d("StudySession", "FlashCard clicked!"); // برای دیباگ
             if (!isAnimating) {
                 flipCard();
             }
         });
 
-        // دکمه flip هم برای چرخاندن
         flipIcon.setOnClickListener(v -> {
-            //android.util.Log.d("StudySession", "Flip icon clicked!");
             if (!isAnimating) {
                 flipCard();
             }
@@ -110,18 +111,18 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             speakWord(word);
         });
 
-        // حذف از علاقه‌مندی‌ها
         favoriteIcon.setOnClickListener(v -> {
             String currentWord = studyWords.get(currentIndex).get("word");
             new Thread(() -> {
                 dbHelper.toggleFavorite(currentWord);
-                isFavorite = dbHelper.isFavorite(currentWord);
+                boolean isFav = dbHelper.isFavorite(currentWord);
                 runOnUiThread(() -> {
-                    //Toast.makeText(this, "❌ " + currentWord + " از علاقه‌مندی‌ها حذف شد", Toast.LENGTH_SHORT).show();
-                     if (isFavorite) {
+                    if (isFav) {
                         favoriteIcon.setImageResource(R.drawable.ic_favorite_filled);
+                        //Toast.makeText(this, "❤️ به علاقه‌مندی‌ها اضافه شد", Toast.LENGTH_SHORT).show();
                     } else {
-                        favoriteIcon.setImageResource(R.drawable.ic_empty_favorites);
+                        favoriteIcon.setImageResource(R.drawable.ic_favorite_outline);
+                        //Toast.makeText(this, "💔 از علاقه‌مندی‌ها حذف شد", Toast.LENGTH_SHORT).show();
                     }
                 });
             }).start();
@@ -132,11 +133,10 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             new Thread(() -> {
                 dbHelper.addToMastered(currentWord);
                 runOnUiThread(() -> {
-                    //Toast.makeText(this, "🎉 " + currentWord + " به کلمات یاد گرفته شده اضافه شد", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "🎉 " + currentWord + " یاد گرفتی! به لیست یادگرفته شده‌ها اضافه شد", Toast.LENGTH_SHORT).show();
                     masteredIcon.setEnabled(false);
                     masteredIcon.setAlpha(0.5f);
 
-                    // ✅ این قسمت کلمه رو از لیست مطالعه حذف میکنه
                     studyWords.remove(currentIndex);
                     if (studyWords.isEmpty()) {
                         Toast.makeText(this, "🎊 تبریک! همه کلمات رو یاد گرفتی!", Toast.LENGTH_LONG).show();
@@ -160,35 +160,11 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private void loadImage(String wordName) {
         imageLoader.loadImage(wordName, wordImage, new ImageLoader.OnImageLoadedListener() {
             @Override
-            public void onSuccess() {
-                //imageProgressBar.setVisibility(View.GONE);
-            }
-
+            public void onSuccess() {}
             @Override
-            public void onFailure() {
-                //imageProgressBar.setVisibility(View.GONE);
-            }
+            public void onFailure() {}
         });
-        //try {
-        //    String imagePath = "pictures/" + wordName.toLowerCase() + ".jpg";
-        //    InputStream is = getAssets().open(imagePath);
-        //    Bitmap bitmap = BitmapFactory.decodeStream(is);
-        //    wordImage.setImageBitmap(bitmap);
-        //} catch (Exception e) {
-        //    try {
-        //        String imagePath = "pictures/" + wordName.toLowerCase() + ".png";
-        //        InputStream is = getAssets().open(imagePath);
-        //        Bitmap bitmap = BitmapFactory.decodeStream(is);
-        //        wordImage.setImageBitmap(bitmap);
-        //    } catch (Exception e2) {
-        //        wordImage.setImageResource(R.drawable.ic_no_image);
-        //    }
-        //}
     }
-
-
-
-
 
     private void flipCard() {
         if (isAnimating) return;
@@ -202,7 +178,6 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         flipOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {}
-
             @Override
             public void onAnimationEnd(Animation animation) {
                 if (isShowingMeaning) {
@@ -212,7 +187,6 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
                 }
                 flashCard.startAnimation(flipIn);
             }
-
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
@@ -220,12 +194,10 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         flipIn.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {}
-
             @Override
             public void onAnimationEnd(Animation animation) {
                 isAnimating = false;
             }
-
             @Override
             public void onAnimationRepeat(Animation animation) {}
         });
@@ -235,8 +207,6 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         HashMap<String, String> currentWord = studyWords.get(currentIndex);
         wordText.setVisibility(View.GONE);
         meaningRelativeView.setVisibility(View.VISIBLE);
-
-        // نمایش تصویر در سمت معنی
         loadImage(currentWord.get("word"));
 
         String persian = currentWord.get("persian");
@@ -263,7 +233,6 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     }
 
     private void showWord() {
-        HashMap<String, String> currentWord = studyWords.get(currentIndex);
         wordText.setVisibility(View.VISIBLE);
         meaningRelativeView.setVisibility(View.GONE);
         isShowingMeaning = false;
@@ -271,11 +240,8 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
     private void updateCard() {
         HashMap<String, String> currentWord = studyWords.get(currentIndex);
-
-        // نمایش کلمه در سمت اول
         wordText.setText(currentWord.get("word"));
 
-        // ذخیره اطلاعات برای سمت دوم
         String persian = currentWord.get("persian");
         String example = currentWord.get("example");
         String exampleTranslation = currentWord.get("example_translation");
@@ -296,31 +262,27 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             exampleTranslationText.setVisibility(View.GONE);
         }
 
-        // سطح
         String level = currentWord.get("level");
         levelText.setText(level);
         setLevelColor(level);
 
-        // وضعیت اولیه (نمایش کلمه)
         wordText.setVisibility(View.VISIBLE);
         meaningRelativeView.setVisibility(View.GONE);
         isShowingMeaning = false;
 
-        // بررسی وضعیت علاقه‌مندی
         checkFavoriteStatus(currentWord.get("word"));
         checkMasteredStatus(currentWord.get("word"));
-
         updateProgress();
     }
-    boolean isFavorite;
+
     private void checkFavoriteStatus(String word) {
         new Thread(() -> {
-            isFavorite = dbHelper.isFavorite(word);
+            boolean isFavorite = dbHelper.isFavorite(word);
             runOnUiThread(() -> {
                 if (isFavorite) {
                     favoriteIcon.setImageResource(R.drawable.ic_favorite_filled);
                 } else {
-                    favoriteIcon.setImageResource(R.drawable.ic_empty_favorites);
+                    favoriteIcon.setImageResource(R.drawable.ic_favorite_outline);
                 }
             });
         }).start();
@@ -372,11 +334,43 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
 
     private void nextWord() {
         if (currentIndex < studyWords.size() - 1) {
+            // ========== CHECK FLASHCARD LIMIT FOR FREE USERS ==========
+            if (!isPremium) {
+                if (!prefsManager.consumeFlashcard()) {
+                    // limit reached - show upsell dialog
+                    PremiumUpsellDialog.showLimitReached(this, new PremiumUpsellDialog.OnPurchaseListener() {
+                        @Override
+                        public void onPurchaseClicked() {
+                            BillingManager billingManager = BillingManager.getInstance(StudySessionActivity.this);
+                            if (billingManager.isReady()) {
+                                billingManager.purchasePremium();
+                            } else {
+                                Toast.makeText(StudySessionActivity.this, "در حال اتصال به بازار... لطفاً دوباره تلاش کنید", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onCancel() {
+                            finish();
+                        }
+                    });
+                    return;
+                }
+                flashcardsStudiedThisSession++;
+
+                // show remaining count toast every 5 flashcards
+                int remaining = prefsManager.getRemainingFreeFlashcards();
+                if (remaining == 5 || remaining == 3 || remaining == 1) {
+                    Toast.makeText(this, "⚠️ " + remaining + " فلش‌کارت رایگان امروز باقی ماند. خرید پریمیوم = نامحدود", Toast.LENGTH_LONG).show();
+                }
+            }
+
             currentIndex++;
             updateCard();
             updateCounter();
             flashCard.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_in_left));
         } else {
+            // session completed - show rating dialog
+            showRatingIfNeeded();
             Toast.makeText(this, "🎉 تبریک! جلسه مطالعه به پایان رسید", Toast.LENGTH_LONG).show();
             finish();
         }
@@ -396,6 +390,10 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
             textToSpeech.setLanguage(Locale.US);
             textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, null);
         }
+    }
+
+    private void showRatingIfNeeded() {
+        RatingManager.showRatingDialogIfNeeded(this);
     }
 
     @Override

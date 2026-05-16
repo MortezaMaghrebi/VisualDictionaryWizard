@@ -11,33 +11,41 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class FavoritesActivity extends AppCompatActivity {
+public class LimitedFavoritesActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private TextView emptyView, statsText;
+    private TextView emptyView, statsText, limitWarningText;
     private ProgressBar progressBar;
     private LinearLayout shareButton, clearButton, studyButton;
     private TextView shareButtonText, clearButtonText, studyButtonText;
-    private ImageView sortButton, clearButtonImage;
-    private LinearLayout statsLayout;
+    private ImageView sortButton;
+    private LinearLayout statsLayout, warningLayout;
 
     private DatabaseHelper dbHelper;
-    private FavoriteAdapter favoriteAdapter;
+    private LimitedFavoriteAdapter favoriteAdapter;
     private ArrayList<HashMap<String, String>> favoritesList;
 
     private String currentSort = "alphabetical";
     private boolean isSelectionMode = false;
-    private int currentSelectedCount = 0;  // اضافه کردن متغیر برای ذخیره تعداد انتخاب
+    private int currentSelectedCount = 0;
+
+    private AppPrefsManager prefsManager;
+    private boolean isPremium;
+    private int maxFreeFavorites = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
+        prefsManager = AppPrefsManager.getInstance(this);
+        isPremium = prefsManager.isPremium();
+
         initViews();
         setupToolbar();
         loadFavorites();
         setupClickListeners();
+        showLimitWarning();
     }
 
     private void initViews() {
@@ -52,8 +60,11 @@ public class FavoritesActivity extends AppCompatActivity {
         shareButtonText = findViewById(R.id.shareButtonText);
         clearButtonText = findViewById(R.id.clearButtonText);
         studyButtonText = findViewById(R.id.studyButtonText);
-        clearButtonImage = findViewById(R.id.clearButtonImage);
         sortButton = findViewById(R.id.sortButton);
+
+        // اضافه کردن ویجت هشدار
+        warningLayout = findViewById(R.id.warningLayout);
+        limitWarningText = findViewById(R.id.limitWarningText);
 
         dbHelper = new DatabaseHelper(this);
         favoritesList = new ArrayList<>();
@@ -66,9 +77,30 @@ public class FavoritesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("❤️ علاقه‌مندی‌ها");
+            if (isPremium) {
+                getSupportActionBar().setTitle("❤️ علاقه‌مندی‌ها (نامحدود)");
+            } else {
+                getSupportActionBar().setTitle("❤️ علاقه‌مندی‌ها (" + maxFreeFavorites + " عدد رایگان)");
+            }
         }
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    private void showLimitWarning() {
+        if (!isPremium && favoritesList.size() >= maxFreeFavorites) {
+            warningLayout.setVisibility(View.VISIBLE);
+            int lockedCount = favoritesList.size() - maxFreeFavorites;
+            if (lockedCount > 0) {
+                limitWarningText.setText("⚠️ شما به حداکثر " + maxFreeFavorites +
+                        " کلمه رایگان رسیده‌اید.\n" + lockedCount +
+                        " کلمه غیرفعال شده‌اند. برای دسترسی به همه کلمات، نسخه پریمیوم را تهیه کنید.");
+            } else {
+                limitWarningText.setText("⚠️ شما به حداکثر " + maxFreeFavorites +
+                        " کلمه رایگان رسیده‌اید.\nبرای اضافه کردن کلمات بیشتر، نسخه پریمیوم را تهیه کنید.");
+            }
+        } else {
+            warningLayout.setVisibility(View.GONE);
+        }
     }
 
     private void loadFavorites() {
@@ -92,6 +124,7 @@ public class FavoritesActivity extends AppCompatActivity {
         emptyView.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         statsLayout.setVisibility(View.GONE);
+        warningLayout.setVisibility(View.GONE);
         shareButton.setEnabled(false);
         clearButton.setEnabled(false);
         studyButton.setEnabled(false);
@@ -104,41 +137,56 @@ public class FavoritesActivity extends AppCompatActivity {
         emptyView.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
         statsLayout.setVisibility(View.VISIBLE);
+        showLimitWarning();
 
-        favoriteAdapter = new FavoriteAdapter(favoritesList, new FavoriteAdapter.OnFavoriteClickListener() {
-            @Override
-            public void onItemClick(HashMap<String, String> word, int position) {
-                if (isSelectionMode) {
-                    favoriteAdapter.toggleSelection(position);
-                    // تعداد در onSelectionChanged آپدیت میشه
-                } else {
-                    openWordDetail(word);
-                }
-            }
+        favoriteAdapter = new LimitedFavoriteAdapter(favoritesList,
+                new LimitedFavoriteAdapter.OnFavoriteClickListener() {
+                    @Override
+                    public void onItemClick(HashMap<String, String> word, int position, boolean isActive) {
+                        if (!isActive) {
+                            // نمایش دیالوگ خرید پریمیوم
+                            showPremiumDialogForLockedWord();
+                            return;
+                        }
 
-            @Override
-            public void onFavoriteClick(HashMap<String, String> word, int position) {
-                removeFromFavorites(word, position);
-            }
+                        if (isSelectionMode) {
+                            favoriteAdapter.toggleSelection(position);
+                        } else {
+                            openWordDetail(word);
+                        }
+                    }
 
-            @Override
-            public boolean onLongClick(int position) {
-                if (!isSelectionMode) {
-                    enterSelectionMode();
-                    favoriteAdapter.toggleSelection(position);
-                    return true;
-                }
-                return false;
-            }
+                    @Override
+                    public void onFavoriteClick(HashMap<String, String> word, int position) {
+                        // فقط برای کلمات فعال امکان حذف وجود دارد
+                        if (position < maxFreeFavorites || isPremium) {
+                            removeFromFavorites(word, position);
+                        } else {
+                            showPremiumDialogForLockedWord();
+                        }
+                    }
 
-            @Override
-            public void onSelectionChanged(int selectedCount) {
-                // وقتی تعداد انتخاب‌ها تغییر کرد، این متد صدا زده میشه
-                currentSelectedCount = selectedCount;
-                updateStudyButtonText();
-                updateShareButtonState();
-            }
-        });
+                    @Override
+                    public boolean onLongClick(int position) {
+                        if (position < maxFreeFavorites || isPremium) {
+                            if (!isSelectionMode) {
+                                enterSelectionMode();
+                                favoriteAdapter.toggleSelection(position);
+                                return true;
+                            }
+                        } else {
+                            showPremiumDialogForLockedWord();
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void onSelectionChanged(int selectedCount) {
+                        currentSelectedCount = selectedCount;
+                        updateStudyButtonText();
+                        updateShareButtonState();
+                    }
+                }, maxFreeFavorites, isPremium);
 
         recyclerView.setAdapter(favoriteAdapter);
         updateStatsText();
@@ -148,8 +196,39 @@ public class FavoritesActivity extends AppCompatActivity {
         }
     }
 
+    private void showPremiumDialogForLockedWord() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("🔒 کلمه غیرفعال")
+                .setMessage("برای دسترسی به این کلمه و تمام کلمات دیگر، باید نسخه پریمیوم را تهیه کنید.\n\n" +
+                        "✨ مزایای نسخه پریمیوم:\n" +
+                        "• دسترسی نامحدود به تمام کلمات\n" +
+                        "• فلش‌کارت نامحدود\n" +
+                        "• حذف تبلیغات\n" +
+                        "• ذخیره نامحدود کلمات در علاقه‌مندی‌ها")
+                .setPositiveButton("خرید پریمیوم", (dialog, which) -> {
+                    BillingManager billingManager = BillingManager.getInstance(this);
+                    if (billingManager.isReady()) {
+                        billingManager.purchasePremium();
+                    } else {
+                        Toast.makeText(this, "در حال اتصال به بازار... لطفاً دوباره تلاش کنید", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("بعداً", null)
+                .show();
+    }
+
     private void updateStatsText() {
-        statsText.setText(favoritesList.size() + " کلمه در لیست علاقه‌مندی‌ها");
+        if (isPremium) {
+            statsText.setText(favoritesList.size() + " کلمه در لیست علاقه‌مندی‌ها (نامحدود)");
+        } else {
+            int activeCount = Math.min(favoritesList.size(), maxFreeFavorites);
+            int lockedCount = favoritesList.size() - maxFreeFavorites;
+            if (lockedCount > 0) {
+                statsText.setText(activeCount + " فعال + " + lockedCount + " غیرفعال | مجموع: " + favoritesList.size());
+            } else {
+                statsText.setText(favoritesList.size() + " از " + maxFreeFavorites + " کلمه رایگان");
+            }
+        }
     }
 
     private void updateStudyButtonText() {
@@ -179,7 +258,7 @@ public class FavoritesActivity extends AppCompatActivity {
             currentSelectedCount = favoriteAdapter.getSelectedCount();
         }
         updateUIForSelectionMode();
-        Toast.makeText(this, "کلمات مورد نظر را انتخاب کنید", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "کلمات فعال را انتخاب کنید", Toast.LENGTH_SHORT).show();
     }
 
     private void exitSelectionMode() {
@@ -194,13 +273,11 @@ public class FavoritesActivity extends AppCompatActivity {
     private void updateUIForSelectionMode() {
         if (isSelectionMode) {
             clearButtonText.setText("بازگشت");
-            clearButtonImage.setImageResource(R.drawable.ic_exit);
+            studyButtonText.setText("مطالعه");
             updateStudyButtonText();
             updateShareButtonState();
-            studyButton.setAlpha(1.0f);
         } else {
             clearButtonText.setText("حذف همه");
-            clearButtonImage.setImageResource(R.drawable.ic_delete);
             studyButtonText.setText("شروع مطالعه");
             shareButton.setEnabled(!favoritesList.isEmpty());
             shareButton.setAlpha(1.0f);
@@ -218,6 +295,7 @@ public class FavoritesActivity extends AppCompatActivity {
                 if (favoriteAdapter != null) {
                     favoriteAdapter.notifyItemRemoved(position);
                     updateStatsText();
+                    showLimitWarning();
 
                     if (favoritesList.isEmpty()) {
                         if (isSelectionMode) {
@@ -265,10 +343,18 @@ public class FavoritesActivity extends AppCompatActivity {
         if (isSelectionMode && favoriteAdapter != null && currentSelectedCount > 0) {
             wordsToShare = new ArrayList<>();
             for (int pos : favoriteAdapter.getSelectedPositions()) {
-                wordsToShare.add(favoritesList.get(pos));
+                // فقط کلمات فعال را به اشتراک بگذار
+                if (pos < maxFreeFavorites || isPremium) {
+                    wordsToShare.add(favoritesList.get(pos));
+                }
             }
         } else {
-            wordsToShare = favoritesList;
+            wordsToShare = new ArrayList<>();
+            // فقط کلمات فعال را به اشتراک بگذار
+            int limit = isPremium ? favoritesList.size() : Math.min(favoritesList.size(), maxFreeFavorites);
+            for (int i = 0; i < limit; i++) {
+                wordsToShare.add(favoritesList.get(i));
+            }
         }
 
         if (wordsToShare.isEmpty()) {
@@ -318,47 +404,38 @@ public class FavoritesActivity extends AppCompatActivity {
     private void startStudySession() {
         ArrayList<HashMap<String, String>> wordsToStudy;
 
-        if (isSelectionMode && favoriteAdapter != null && currentSelectedCount > 0) {
-            wordsToStudy = new ArrayList<>();
-            for (int pos : favoriteAdapter.getSelectedPositions()) {
-                HashMap<String, String> word = favoritesList.get(pos);
+        // فقط کلمات فعال (قابل دسترس) را برای مطالعه انتخاب کن
+        wordsToStudy = new ArrayList<>();
+        int limit = isPremium ? favoritesList.size() : Math.min(favoritesList.size(), maxFreeFavorites);
+
+        for (int i = 0; i < limit; i++) {
+            HashMap<String, String> word = favoritesList.get(i);
+            String currentWord = word.get("word");
+            boolean isMastered = dbHelper.isMastered(currentWord);
+            if (!isMastered) {
                 wordsToStudy.add(word);
-            }
-        } else {
-            wordsToStudy = new ArrayList<>();
-            for (HashMap<String, String> word : favoritesList) {
-                String currentWord = word.get("word");
-                boolean isMastered = dbHelper.isMastered(currentWord);
-                if (!isMastered) {
-                    wordsToStudy.add(word);
-                }
             }
         }
 
         if (wordsToStudy.isEmpty()) {
             String message;
-            if (!isSelectionMode) {
-                message = "همه کلمات علاقه‌مندی شما قبلاً یاد گرفته شده‌اند!\nاز صفحه کلمات یادگرفته شده می‌توانید مرور کنید.";
+            if (!isPremium && favoritesList.size() > maxFreeFavorites) {
+                message = "برای مطالعه کلمات بیشتر، لطفاً نسخه پریمیوم را تهیه کنید.\n\n" +
+                        "کلمات فعال: " + Math.min(favoritesList.size(), maxFreeFavorites) + "\n" +
+                        "کلمات غیرفعال: " + (favoritesList.size() - maxFreeFavorites);
             } else {
-                message = "کلمه‌ای برای مطالعه انتخاب نشده";
+                message = "همه کلمات علاقه‌مندی شما قبلاً یاد گرفته شده‌اند!";
             }
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
-            if (!isSelectionMode && favoritesList.isEmpty()) {
-                new androidx.appcompat.app.AlertDialog.Builder(this)
-                        .setTitle("🎉 همه کلمات رو یاد گرفتی!")
-                        .setMessage("تمام کلمات علاقه‌مندی شما قبلاً یاد گرفته شده‌اند.\nمی‌خواهید کلمات یادگرفته شده را مرور کنید؟")
-                        .setPositiveButton("مشاهده", (dialog, which) -> {
-                            Intent intent = new Intent(FavoritesActivity.this, MasteredWordsActivity.class);
-                            startActivity(intent);
-                        })
-                        .setNegativeButton("بعداً", null)
-                        .show();
-            }
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("📖 شروع مطالعه")
+                    .setMessage(message)
+                    .setPositiveButton("باشه", null)
+                    .show();
             return;
         }
 
-        Intent intent = new Intent(FavoritesActivity.this, StudySessionActivity.class);
+        Intent intent = new Intent(LimitedFavoritesActivity.this, StudySessionActivity.class);
         intent.putExtra("study_words", wordsToStudy);
         startActivity(intent);
     }
@@ -375,7 +452,12 @@ public class FavoritesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (favoritesList.isEmpty() || favoriteAdapter == null) {
+        // بررسی تغییر وضعیت پریمیوم
+        boolean newPremiumStatus = prefsManager.isPremium();
+        if (newPremiumStatus != isPremium) {
+            isPremium = newPremiumStatus;
+            recreate(); // بازآفرینی اکتیویتی برای اعمال تغییرات
+        } else if (favoritesList.isEmpty() || favoriteAdapter == null) {
             loadFavorites();
         }
     }

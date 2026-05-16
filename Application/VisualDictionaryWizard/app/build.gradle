@@ -56,7 +56,7 @@ android {
                     marketBindAddress: "${marketBindAddress}",
                     marketPermission: "com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR"
             ]
-            buildConfigField "String", "IAB_PUBLIC_KEY", "\"MIHNMA0GCSqGSIb3DQEBAQUAA4G7ADCBtwKBrwDJj5btdckeUJuSXWBdGmdjH3YInXmtKfM8hCP19qnTUhYFbiZj5ql0AohAT0MqefZRqjlWctMfhBqbbuJcEpnSh9C3qL030zFaPT+VPSfrfMdN0zf4vXltRxiZZE0fYM0BX+SABEWs0NjTE9QqQ5e5yj/NoIDoQEh38niweLshL7PA/GGqF1k8VP2C0B7nrandcitxgMQNKfaeTxNScd1t+LgT/rORsaddxuaiX7sCAwEAAQ==\""
+            buildConfigField "String", "IAB_PUBLIC_KEY", "\"MIHNMA0GCSqGSIb3DQEBAQUAA4G7ADCBtwKBrwCmp2ebUhdy8e/n1XJs0AwzDCCLt4PjmfW3s0Dx8K9l8GZTGKT9PTEq2GNxHdYHmfropwNYgTXr1Dz0OFF9zxUBnMWQEgQJdWAiwTmudI5SPC1zSFA7HOHnx92P9P4DE3v/xyVhODvbmEVnLmpXbj2dhfftT5IWK+1RK1mazrrFfNoMZbGgmhE9H6MJ13boj+KZR5tcV93g5SfHH5TaIcF71ltn/CsWh9vmbJ32cTUCAwEAAQ==\""
             buildConfigField "String", "STORE_NAME", "\"bazaar\""
         }
     }
@@ -85,6 +85,10 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
+    //adivery
+    implementation 'com.adivery:sdk:4.8.3'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.10'
 }
 // وابستگی‌های خاص هر flavor
 dependencies {
