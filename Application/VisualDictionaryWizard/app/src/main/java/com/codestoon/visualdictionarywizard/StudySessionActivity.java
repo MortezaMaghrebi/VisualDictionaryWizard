@@ -32,14 +32,14 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     private DatabaseHelper dbHelper;
     private RelativeLayout meaningRelativeView;
     private TextView exampleText, exampleTranslationText;
-
     private boolean isAnimating = false;
+    private ImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_study_session);
-
+        imageLoader = ImageLoader.getInstance(this);
         studyWords = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("study_words");
         if (studyWords == null || studyWords.isEmpty()) {
             Toast.makeText(this, "کلمه‌ای برای مطالعه وجود ندارد", Toast.LENGTH_SHORT).show();
@@ -158,21 +158,32 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
     }
 
     private void loadImage(String wordName) {
-        try {
-            String imagePath = "pictures/" + wordName.toLowerCase() + ".jpg";
-            InputStream is = getAssets().open(imagePath);
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-            wordImage.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            try {
-                String imagePath = "pictures/" + wordName.toLowerCase() + ".png";
-                InputStream is = getAssets().open(imagePath);
-                Bitmap bitmap = BitmapFactory.decodeStream(is);
-                wordImage.setImageBitmap(bitmap);
-            } catch (Exception e2) {
-                wordImage.setImageResource(R.drawable.ic_no_image);
+        imageLoader.loadImage(wordName, wordImage, new ImageLoader.OnImageLoadedListener() {
+            @Override
+            public void onSuccess() {
+                //imageProgressBar.setVisibility(View.GONE);
             }
-        }
+
+            @Override
+            public void onFailure() {
+                //imageProgressBar.setVisibility(View.GONE);
+            }
+        });
+        //try {
+        //    String imagePath = "pictures/" + wordName.toLowerCase() + ".jpg";
+        //    InputStream is = getAssets().open(imagePath);
+        //    Bitmap bitmap = BitmapFactory.decodeStream(is);
+        //    wordImage.setImageBitmap(bitmap);
+        //} catch (Exception e) {
+        //    try {
+        //        String imagePath = "pictures/" + wordName.toLowerCase() + ".png";
+        //        InputStream is = getAssets().open(imagePath);
+        //        Bitmap bitmap = BitmapFactory.decodeStream(is);
+        //        wordImage.setImageBitmap(bitmap);
+        //    } catch (Exception e2) {
+        //        wordImage.setImageResource(R.drawable.ic_no_image);
+        //    }
+        //}
     }
 
 

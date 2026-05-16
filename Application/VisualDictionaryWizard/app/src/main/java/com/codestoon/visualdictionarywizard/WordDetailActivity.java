@@ -28,12 +28,14 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
     private MediaPlayer mediaPlayer;
     private String currentWord;
     private boolean isFavorite = false;
+    private ImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word_detail);
 
+        imageLoader = ImageLoader.getInstance(this);
         // دریافت داده از Intent
         currentWord = getIntent().getStringExtra("word");
         if (currentWord == null) {
@@ -107,7 +109,7 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         levelText.setBackgroundColor(color);
     }
 
-    private void loadImage(String wordName) {
+    private void loadImage_old(String wordName) {
         imageProgressBar.setVisibility(View.VISIBLE);
 
         try {
@@ -130,6 +132,21 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
+    private void loadImage(String wordName) {
+        imageProgressBar.setVisibility(View.VISIBLE);
+
+        imageLoader.loadImage(wordName, wordImageView, new ImageLoader.OnImageLoadedListener() {
+            @Override
+            public void onSuccess() {
+                imageProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure() {
+                imageProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
     private void checkFavoriteStatus() {
         // بررسی وضعیت علاقه‌مندی از دیتابیس
         new Thread(() -> {
