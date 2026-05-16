@@ -229,7 +229,7 @@ public class FavoritesActivity extends AppCompatActivity {
                         updateStudyButtonText();
                     }
                 }
-                Toast.makeText(this, "❌ " + wordText + " حذف شد", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "❌ " + wordText + " حذف شد", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }

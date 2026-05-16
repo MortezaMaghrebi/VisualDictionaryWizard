@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VisualDictionaryWizard">
         <activity
+            android:name=".CommentNegativeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CommentActivity"
+            android:exported="false" />
+        <activity
             android:name=".LimitedFavoritesActivity"
             android:exported="false" />
         <activity

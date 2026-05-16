@@ -3,105 +3,184 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="#f5f7fa"
     android:layoutDirection="rtl"
-    android:background="#f5f7fa">
+    android:orientation="vertical">
 
     <!-- هدر با گرادیانت -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:orientation="vertical"
-        android:padding="20dp"
         android:background="@drawable/gradient_background"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <TextView
-            android:fontFamily="@font/yekan"
             android:id="@+id/welcomeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/yekan"
             android:text="سلام! وقت بخیر"
+            android:textColor="#fff"
             android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#fff"/>
+            android:textStyle="bold" />
 
         <TextView
-            android:fontFamily="@font/yekan"
             android:id="@+id/wordCountText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/yekan"
             android:text="📚 0 کلمه"
-            android:textSize="14sp"
             android:textColor="#ddd"
-            android:layout_marginTop="8dp"/>
+            android:textSize="14sp" />
 
     </LinearLayout>
 
     <!-- سطح‌بندی CEFR -->
     <TextView
-        android:fontFamily="@font/yekan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="📖 سطح خود را انتخاب کنید"
-        android:textStyle="bold"
-        android:textSize="16sp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
-        android:textColor="#333"/>
+        android:fontFamily="@font/yekan"
+        android:text="📖 سطح خود را انتخاب کنید"
+        android:textColor="#333"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/levelRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="8dp"
-        android:nestedScrollingEnabled="false"/>
+        android:nestedScrollingEnabled="false"
+        android:padding="8dp" />
 
     <!-- کلمات اخیر / پیشنهادی -->
     <TextView
-        android:fontFamily="@font/yekan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="⭐ کلمات محبوب شما"
-        android:textStyle="bold"
-        android:textSize="16sp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:fontFamily="@font/yekan"
+        android:text="⭐ کلمات محبوب شما"
         android:textColor="#333"
-        android:visibility="gone"/>
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recentWordsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:elevation="4dp"
+        android:id="@+id/bannerAdLayout"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+        <!-- بنر تبلیغاتی (فقط برای کاربران رایگان) -->
+        <LinearLayout
+             android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/ic_crown" />
+
+            <TextView
+                android:id="@+id/bannerAdText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/yekan"
+                android:text="نسخه پریمیوم: فلش‌کارت نامحدود + حذف تبلیغات"
+                android:textColor="#2c3e50"
+                android:textSize="15dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/yekan"
+                android:id="@+id/tvPremiumPurchase"
+                android:text="مشاهده"
+                android:textSize="20dp"
+                android:textColor="#3498db"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+        <!-- بنر تبلیغات (فقط برای کاربران رایگان) -->
+        <LinearLayout
+            android:id="@+id/bannerAdContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.adivery.sdk.AdiveryBannerAdView
+                android:id="@+id/banner_ad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:banner_size="banner" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/yekan"
+                android:text="تبلیغات"
+                android:textColor="#999"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- دکمه‌های پایین (طراحی جدید) -->
     <!-- دکمه‌های پایین (طراحی جدید با دکمه سایر اپ‌ها) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="12dp"
-        android:paddingBottom="16dp"
         android:background="#FFFFFF"
-        android:elevation="10dp">
+        android:elevation="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:paddingBottom="16dp">
 
         <LinearLayout
             android:id="@+id/searchButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="48dp"
@@ -113,18 +192,18 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_search"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </FrameLayout>
 
             <TextView
-                android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/yekan"
                 android:text="جستجو"
-                android:textSize="11sp"
                 android:textColor="#3498db"
-                android:layout_marginTop="6dp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -133,11 +212,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="48dp"
@@ -149,18 +228,18 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_favorite_outline"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </FrameLayout>
 
             <TextView
-                android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/yekan"
                 android:text="علاقه‌مندی"
-                android:textSize="11sp"
                 android:textColor="#E74C3C"
-                android:layout_marginTop="6dp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -169,11 +248,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="48dp"
@@ -185,18 +264,18 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_mastered"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </FrameLayout>
 
             <TextView
-                android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/yekan"
                 android:text="یادگرفته‌ها"
-                android:textSize="11sp"
                 android:textColor="#27AE60"
-                android:layout_marginTop="6dp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -205,11 +284,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="48dp"
@@ -221,18 +300,18 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_random"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </FrameLayout>
 
             <TextView
-                android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/yekan"
                 android:text="تصادفی"
-                android:textSize="11sp"
                 android:textColor="#9C27B0"
-                android:layout_marginTop="6dp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
@@ -241,11 +320,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackgroundBorderless">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <FrameLayout
                 android:layout_width="48dp"
@@ -257,63 +336,24 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_other_apps"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </FrameLayout>
 
             <TextView
-                android:fontFamily="@font/yekan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/yekan"
                 android:text="سایر اپ‌ها"
-                android:textSize="11sp"
                 android:textColor="#FF9800"
-                android:layout_marginTop="6dp" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- بنر تبلیغاتی (فقط برای کاربران رایگان) -->
-    <LinearLayout
-        android:id="@+id/bannerAdLayout"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:elevation="4dp"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground">
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_crown"
-            android:layout_marginEnd="12dp" />
-
-        <TextView
-            android:fontFamily="@font/yekan"
-            android:id="@+id/bannerAdText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="نسخه پریمیوم: فلش‌کارت نامحدود + حذف تبلیغات"
-            android:textSize="13sp"
-            android:textColor="#2c3e50" />
-
-        <TextView
-            android:fontFamily="@font/yekan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="مشاهده"
-            android:textColor="#3498db"
-            android:textStyle="bold"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
-
-    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"

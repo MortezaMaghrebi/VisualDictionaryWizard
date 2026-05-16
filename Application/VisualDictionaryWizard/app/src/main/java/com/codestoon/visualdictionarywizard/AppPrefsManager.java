@@ -1,5 +1,6 @@
 package com.codestoon.visualdictionarywizard;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import java.util.Calendar;
@@ -18,27 +19,27 @@ public class AppPrefsManager {
     private final SharedPreferences prefs;
     private final SharedPreferences.Editor editor;
 
-    private AppPrefsManager(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+    Activity activity;
+
+    private AppPrefsManager(Activity activity) {
+        prefs = activity.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         editor = prefs.edit();
+        this.activity=activity;
     }
 
-    public static synchronized AppPrefsManager getInstance(Context context) {
+    public static synchronized AppPrefsManager getInstance(Activity activity) {
         if (instance == null) {
-            instance = new AppPrefsManager(context);
+            instance = new AppPrefsManager(activity);
         }
         return instance;
     }
 
     // ========== Premium ==========
     public boolean isPremium() {
-        return prefs.getBoolean(KEY_IS_PREMIUM, false);
+        return BillingManager.getInstance(activity).isPremiumActivated();
     }
 
-    public void setPremium(boolean isPremium) {
-        editor.putBoolean(KEY_IS_PREMIUM, isPremium);
-        editor.apply();
-    }
+
 
     // ========== Flashcard Limits for Free Users ==========
     private static final int MAX_FREE_FLASHCARDS_PER_DAY = 15;
@@ -92,13 +93,36 @@ public class AppPrefsManager {
     private static final int MIN_DAYS_BETWEEN_RATING_REQUESTS = 3;
     private static final int MAX_RATING_REQUESTS = 3;
 
+
+
+
+
+    // ========== Favorite Limit for Free Users (Optional) ==========
+    private static final int MAX_FREE_FAVORITES = 20;
+
+    public boolean canAddToFavorites(int currentFavoritesCount) {
+        if (isPremium()) return true;
+        return currentFavoritesCount < MAX_FREE_FAVORITES;
+    }
+
+    public int getMaxFreeFavorites() {
+        return MAX_FREE_FAVORITES;
+    }
+
+    // ========== Rating Management ==========
+
+
     public boolean shouldShowRatingDialog() {
+        // کاربر پریمیوم نیازی به نمایش دیالوگ نظر ندارد
+        if (isPremium()) {
+            return false;
+        }
+
         if (prefs.getBoolean(KEY_USER_RATED, false)) {
             return false;
         }
 
         if (prefs.getBoolean(KEY_USER_DECLINED_RATING, false)) {
-            // check if enough time passed
             long lastDeclineDate = prefs.getLong(KEY_RATING_LAST_REQUEST_DATE, 0);
             long daysPassed = (System.currentTimeMillis() - lastDeclineDate) / (24 * 60 * 60 * 1000);
             if (daysPassed < MIN_DAYS_BETWEEN_RATING_REQUESTS) {
@@ -130,17 +154,5 @@ public class AppPrefsManager {
         editor.putBoolean(KEY_USER_DECLINED_RATING, true);
         editor.putLong(KEY_RATING_LAST_REQUEST_DATE, System.currentTimeMillis());
         editor.apply();
-    }
-
-    // ========== Favorite Limit for Free Users (Optional) ==========
-    private static final int MAX_FREE_FAVORITES = 20;
-
-    public boolean canAddToFavorites(int currentFavoritesCount) {
-        if (isPremium()) return true;
-        return currentFavoritesCount < MAX_FREE_FAVORITES;
-    }
-
-    public int getMaxFreeFavorites() {
-        return MAX_FREE_FAVORITES;
     }
 }

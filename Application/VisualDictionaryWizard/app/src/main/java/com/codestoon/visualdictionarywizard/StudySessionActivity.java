@@ -44,7 +44,7 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         imageLoader = ImageLoader.getInstance(this);
         dbHelper = new DatabaseHelper(this);
         prefsManager = AppPrefsManager.getInstance(this);
-        isPremium = prefsManager.isPremium();
+        isPremium = BillingManager.getInstance(StudySessionActivity.this).isPremiumActivated();
 
         studyWords = (ArrayList<HashMap<String, String>>) getIntent().getSerializableExtra("study_words");
 

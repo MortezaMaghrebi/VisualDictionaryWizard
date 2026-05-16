@@ -1,5 +1,6 @@
 package com.codestoon.visualdictionarywizard;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -307,7 +308,7 @@ public class LimitedFavoritesActivity extends AppCompatActivity {
                         updateStudyButtonText();
                     }
                 }
-                Toast.makeText(this, "❌ " + wordText + " حذف شد", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "❌ " + wordText + " حذف شد", Toast.LENGTH_SHORT).show();
             });
         }).start();
     }
@@ -430,7 +431,13 @@ public class LimitedFavoritesActivity extends AppCompatActivity {
             new androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("📖 شروع مطالعه")
                     .setMessage(message)
-                    .setPositiveButton("باشه", null)
+                    .setPositiveButton("مشاهده نسخه پریمیوم", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            BillingManager.getInstance(LimitedFavoritesActivity.this).purchasePremium();
+                        }
+                    })
+                    .setNegativeButton("بعدا", null)
                     .show();
             return;
         }
