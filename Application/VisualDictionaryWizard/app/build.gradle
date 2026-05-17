@@ -14,8 +14,8 @@ android {
         applicationId "com.codestoon.visualdictionarywizard"
         minSdk 24
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +39,7 @@ android {
                     marketBindAddress: "${marketBindAddress}",
                     marketPermission: "${marketApplicationId}.BILLING"
             ]
-            buildConfigField "String", "IAB_PUBLIC_KEY", "\"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCb2XB7dmFB3vAHgEEc/9CwTCw8hOb4ojgX/hyOCJ7Q6AxN0GOxhmi2NjLCXiQwMr2R+jb9109fHXXK0NHikcmWCiW6TsrYWvgAUzLKNvBoipJ+C59AD0M+Mvia9QGMeOu+4ieTivxABXb2yh8RlwQETP4wXFIRdMt3gEaoB8Pj4wIDAQAB\""
+            buildConfigField "String", "IAB_PUBLIC_KEY", "\"MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmF7QkVu7ERXP/xg6LftwWbSaAmjCmxwQy0qNdAHQSESnndIxTASH+MDNvk+5hOpgABwJaw+99Kie14ZlOPG9C7oVo1FrH81h6OoL0Sf2LaESjGV8bm9wujCswNWXVk4fvmUOkHcBlMLFEa2IV1bY+7B6y0NtcFBoQ8Mu4+knZyQIDAQAB\""
             buildConfigField "String", "STORE_NAME", "\"myket\""
         }
 

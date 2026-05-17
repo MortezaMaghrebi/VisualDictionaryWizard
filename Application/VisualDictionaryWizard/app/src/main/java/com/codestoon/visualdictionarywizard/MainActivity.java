@@ -2,6 +2,7 @@ package com.codestoon.visualdictionarywizard;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -239,8 +240,12 @@ public class MainActivity extends AppCompatActivity {
         if (bannerAdContainer == null) return;
         if (isPremium) {
             bannerAdContainer.setVisibility(View.GONE);
+            tvPremiumPurchase.setText("فعال");
+            tvPremiumPurchase.setTextColor(Color.parseColor("#408040"));
         } else {
             bannerAdContainer.setVisibility(View.VISIBLE);
+            tvPremiumPurchase.setText("مشاهده");
+            tvPremiumPurchase.setTextColor(Color.BLUE);
         }
     }
 

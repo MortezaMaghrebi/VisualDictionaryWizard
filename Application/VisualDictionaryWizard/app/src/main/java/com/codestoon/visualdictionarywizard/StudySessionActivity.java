@@ -88,7 +88,7 @@ public class StudySessionActivity extends AppCompatActivity implements TextToSpe
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle(isPremium ? "📖 جلسه مطالعه (نامحدود)" : "📖 جلسه مطالعه");
+            getSupportActionBar().setTitle(isPremium ? "📖 جلسه مطالعه" : "📖 جلسه مطالعه (محدود)");
         }
         toolbar.setNavigationOnClickListener(v -> finish());
     }
