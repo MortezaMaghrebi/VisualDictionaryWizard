@@ -3,11 +3,13 @@ package com.codestoon.visualdictionarywizard;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private LinearLayout bannerAdContainer;
     private AdiveryBannerAdView bannerAd;
-
+    LinearLayout aboutButton;
     // Database
     private DatabaseHelper dbHelper;
 
@@ -110,6 +112,10 @@ public class MainActivity extends AppCompatActivity {
         bannerAdContainer = findViewById(R.id.bannerAdContainer);
         tvPremiumPurchase = findViewById(R.id.tvPremiumPurchase);
         bannerAd = findViewById(R.id.banner_ad);
+        aboutButton = findViewById(R.id.aboutButton);
+        // دکمه درباره برنامه
+
+
     }
 
     private void initializeBilling() {
@@ -201,6 +207,41 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+
+    /**
+     * نمایش دیالوگ درباره برنامه با جزئیات مالکیت معنوی
+     */
+    private void showAboutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("ℹ️ درباره دیکشنری تصویری");
+
+        String aboutText = "📖 دیکشنری تصویری دیکتی\n\n" +
+                "🖼️ تصاویر:\n" +
+                "• تمامی تصاویر دیکشنری از وب‌سایت Pexels.com دانلود شده‌اند\n" +
+                "• لایسنس: Free to use (بدون نیاز به Attribution)\n" +
+                "• لینک: https://www.pexels.com\n\n" +
+                "🤖 محتوای دیکشنری:\n" +
+                "• تمامی کلمات، تعاریف، مثال‌ها و سطح‌بندی‌ها\n" +
+                "• توسط هوش مصنوعی (AI) تولید شده‌اند\n" +
+                "• فاقد کپی‌برداری از دیکشنری‌های دارای حق چاپ\n\n" +
+                "👨‍💻 توسعه‌دهنده:\n" +
+                "• Morteza Maghrebi\n" +
+                "• GitHub: github.com/mortezamaghrebi\n\n" +
+                "© 2026 کلیه حقوق محفوظ است";
+
+        builder.setMessage(aboutText);
+        builder.setPositiveButton("بستن", null);
+        builder.setNegativeButton("بازدید گیت‌هاب", (dialog, which) -> {
+            try {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/mortezamaghrebi"));
+                startActivity(browserIntent);
+            } catch (Exception e) {
+                Toast.makeText(this, "github.com/mortezamaghrebi", Toast.LENGTH_LONG).show();
+            }
+        });
+        builder.show();
+    }
     private void showWelcomeMessage() {
         String[] greetings = {"به دیکشنری تصویری خوش آمدید", "آماده یادگیری هستی؟"};
         int randomIndex = (int) (Math.random() * greetings.length);
@@ -283,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
         masteredButton.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, MasteredWordsActivity.class));
         });
-
+        aboutButton.setOnClickListener(v -> showAboutDialog());
         // دکمه کلمه تصادفی
         randomButton.setOnClickListener(v -> {
             new Thread(() -> {

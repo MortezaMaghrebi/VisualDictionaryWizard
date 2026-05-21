@@ -147,17 +147,11 @@
                 android:layout_gravity="center"
                 app:banner_size="banner" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:fontFamily="@font/yekan"
-                android:text="تبلیغات"
-                android:textColor="#999"
-                android:textSize="10sp" />
+
 
         </LinearLayout>
     </LinearLayout>
+
 
     <!-- دکمه‌های پایین (طراحی جدید) -->
     <!-- دکمه‌های پایین (طراحی جدید با دکمه سایر اپ‌ها) -->
@@ -278,7 +272,42 @@
                 android:textSize="11sp" />
 
         </LinearLayout>
+        <!-- دکمه درباره برنامه -->
+        <LinearLayout
+            android:id="@+id/aboutButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/circle_button_bg_about">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_info"
+                    app:tint="#FFFFFF" />
+
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/yekan"
+                android:text="درباره"
+                android:textColor="#607D8B"
+                android:textSize="11sp" />
+
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/randomButton"
             android:layout_width="0dp"
@@ -288,6 +317,7 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
+            android:visibility="gone"
             android:orientation="vertical">
 
             <FrameLayout
