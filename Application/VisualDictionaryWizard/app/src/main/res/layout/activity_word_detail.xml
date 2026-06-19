@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- هدر با تصویر و کلمه - استفاده از CardView با تعریف کامل -->
+        <!-- هدر با تصویر و کلمه -->
         <androidx.cardview.widget.CardView
             android:id="@+id/headerCardView"
             android:layout_width="match_parent"
@@ -56,7 +56,7 @@
 
                 <!-- کلمه و معنی -->
                 <TextView
-            android:fontFamily="@font/yekan"
+                    android:fontFamily="@font/yekan"
                     android:id="@+id/wordText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                     android:gravity="center" />
 
                 <TextView
-            android:fontFamily="@font/yekan"
+                    android:fontFamily="@font/yekan"
                     android:id="@+id/persianText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,7 +86,7 @@
                     android:background="#f0f0f0">
 
                     <TextView
-            android:fontFamily="@font/yekan"
+                        android:fontFamily="@font/yekan"
                         android:id="@+id/pronunciationText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -160,24 +160,44 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-            android:fontFamily="@font/yekan"
-                    android:layout_width="wrap_content"
+                <!-- هدر مثال با دکمه تلفظ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📖 مثال"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#2c3e50" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:fontFamily="@font/yekan"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📖 مثال"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#2c3e50" />
+
+                    <ImageButton
+                        android:id="@+id/speakExampleIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_speaker_small"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="تلفظ مثال"
+                        app:tint="#3498db" />
+
+                </LinearLayout>
 
                 <TextView
-            android:fontFamily="@font/yekan"
+                    android:fontFamily="@font/yekan"
                     android:id="@+id/exampleText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:textColor="#555"
                     android:layout_marginTop="8dp"
-                    android:lineSpacingExtra="4dp" />
+                    android:lineSpacingExtra="4dp"
+                    android:textIsSelectable="true" />
 
                 <View
                     android:layout_width="match_parent"
@@ -186,13 +206,24 @@
                     android:layout_marginVertical="12dp" />
 
                 <TextView
-            android:fontFamily="@font/yekan"
+                    android:fontFamily="@font/yekan"
                     android:id="@+id/exampleTranslationText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
                     android:textColor="#7f8c8d"
                     android:lineSpacingExtra="4dp" />
+
+                <!-- راهنمای کلیک روی کلمات -->
+                <TextView
+                    android:fontFamily="@font/yekan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💡 روی کلمات انگلیسی کلیک کنید تا معنی آنها را ببینید"
+                    android:textSize="11sp"
+                    android:textColor="#999"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center" />
 
             </LinearLayout>
 
@@ -215,7 +246,7 @@
                 android:padding="16dp">
 
                 <TextView
-            android:fontFamily="@font/yekan"
+                    android:fontFamily="@font/yekan"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="🔄 مترادف"
@@ -224,13 +255,25 @@
                     android:textColor="#2c3e50" />
 
                 <TextView
-            android:fontFamily="@font/yekan"
+                    android:fontFamily="@font/yekan"
                     android:id="@+id/synonymText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:textColor="#555"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    android:textIsSelectable="true" />
+
+                <!-- راهنمای کلیک روی مترادف‌ها -->
+                <TextView
+                    android:fontFamily="@font/yekan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💡 روی هر مترادف کلیک کنید تا معنی آن را ببینید"
+                    android:textSize="11sp"
+                    android:textColor="#999"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center" />
 
             </LinearLayout>
 
