@@ -25,9 +25,11 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
 
     private TextView wordText, persianText, pronunciationText, levelText;
     private TextView exampleText, exampleTranslationText, synonymText;
-    private ImageView wordImageView, favoriteIcon, speakIcon, speakExampleIcon;
+    private TextView synonymPersianText;
+    private ImageView wordImageView, favoriteIcon, speakIcon, speakExampleIcon, speakSynonymIcon, speakPersianIcon;
     private CardView exampleCard, synonymCard;
     private ProgressBar imageProgressBar;
+    private LinearLayout synonymPersianLayout;
 
     private HashMap<String, String> wordData;
     private DatabaseHelper dbHelper;
@@ -43,7 +45,6 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         setContentView(R.layout.activity_word_detail);
 
         imageLoader = ImageLoader.getInstance(this);
-        // دریافت داده از Intent
         currentWord = getIntent().getStringExtra("word");
         if (currentWord == null) {
             finish();
@@ -55,8 +56,9 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         setupFavoriteButton();
         setupSpeakButton();
         setupSpeakExampleButton();
+        setupSpeakSynonymButton();
+        setupSpeakPersianButton();
 
-        // طبق مقاله: تجربه کاربری شخصی‌سازی شده = افزایش نرخ بازگشت
         textToSpeech = new TextToSpeech(this, this);
     }
 
@@ -68,13 +70,17 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         exampleText = findViewById(R.id.exampleText);
         exampleTranslationText = findViewById(R.id.exampleTranslationText);
         synonymText = findViewById(R.id.synonymText);
+        synonymPersianText = findViewById(R.id.synonymPersianText);
         wordImageView = findViewById(R.id.wordImageView);
         favoriteIcon = findViewById(R.id.favoriteIcon);
         speakIcon = findViewById(R.id.speakIcon);
         speakExampleIcon = findViewById(R.id.speakExampleIcon);
+        speakSynonymIcon = findViewById(R.id.speakSynonymIcon);
+        speakPersianIcon = findViewById(R.id.speakPersianIcon);
         exampleCard = findViewById(R.id.exampleCard);
         synonymCard = findViewById(R.id.synonymCard);
         imageProgressBar = findViewById(R.id.imageProgressBar);
+        synonymPersianLayout = findViewById(R.id.synonymPersianLayout);
 
         dbHelper = new DatabaseHelper(this);
     }
@@ -90,12 +96,8 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
             pronunciationText.setText("/" + wordData.get("pronunciation") + "/");
             levelText.setText(wordData.get("level"));
 
-            // تنظیم مثال با قابلیت کلیک روی کلمات
             setupClickableExample(wordData.get("example"));
-
             exampleTranslationText.setText(wordData.get("example_translation"));
-
-            // تنظیم مترادف با قابلیت کلیک
             setupClickableSynonyms(wordData.get("synonym"));
 
             setLevelColor(wordData.get("level"));
@@ -107,22 +109,17 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    /**
-     * بررسی وجود کلمه در دیتابیس (با جستجوی مستقیم)
-     */
     private boolean wordExistsInDatabase(String word) {
         if (word == null || word.isEmpty()) return false;
-
-        // جستجوی دقیق در دیتابیس
         HashMap<String, String> result = dbHelper.getWordByExactMatch(word);
         return result != null;
     }
 
     /**
-     * پیدا کردن بهترین تطابق برای یک کلمه در دیکشنری با جستجوی دیتابیس
-     * مثلاً violently → violent
+     * پیدا کردن بهترین تطابق و موقعیت آن در کلمه اصلی
+     * مثلاً برای "important" برمیگرداند: "import" با موقعیت 0 تا 6
      */
-    private String findBestMatchingWord(String word) {
+    private String[] findBestMatchingWithPosition(String word) {
         if (word == null || word.isEmpty()) {
             return null;
         }
@@ -131,85 +128,67 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
 
         // 1. بررسی تطابق دقیق
         if (wordExistsInDatabase(lowerWord)) {
-            return lowerWord;
+            return new String[]{lowerWord, "0", String.valueOf(lowerWord.length())};
         }
 
-        // 2. حذف پسوندهای رایج و بررسی مجدد
+        // 2. حذف پسوندهای رایج
         String[] suffixes = {
                 "ly", "ness", "tion", "sion", "ment", "ing", "ed", "er", "or",
                 "al", "able", "ible", "ous", "ive", "ative", "itive", "ful", "less",
-                "ously", "ially", "ually", "fully", "lessly", "ness", "ment"
+                "ously", "ially", "ually", "fully", "lessly", "ness", "ment",
+                "ant", "ent", "ance", "ence", "ancy", "ency", "ism", "ist",
+                "ate", "ute", "ify", "ize", "ise"
         };
 
         for (String suffix : suffixes) {
             if (lowerWord.endsWith(suffix)) {
                 String withoutSuffix = lowerWord.substring(0, lowerWord.length() - suffix.length());
                 if (withoutSuffix.length() >= 2 && wordExistsInDatabase(withoutSuffix)) {
-                    return withoutSuffix;
+                    return new String[]{withoutSuffix, "0", String.valueOf(withoutSuffix.length())};
                 }
             }
         }
 
-        // 3. بررسی پسوندهای خاص
-        // tion → t/te/ate
+        // 3. پسوندهای خاص
         if (lowerWord.endsWith("tion")) {
             String withoutTion = lowerWord.substring(0, lowerWord.length() - 3);
             if (wordExistsInDatabase(withoutTion)) {
-                return withoutTion;
+                return new String[]{withoutTion, "0", String.valueOf(withoutTion.length())};
             }
             String withTe = lowerWord.substring(0, lowerWord.length() - 4) + "te";
             if (wordExistsInDatabase(withTe)) {
-                return withTe;
+                return new String[]{withTe, "0", String.valueOf(withTe.length())};
             }
         }
 
-        // sion → s/ss
         if (lowerWord.endsWith("sion")) {
             String withoutSion = lowerWord.substring(0, lowerWord.length() - 2);
             if (wordExistsInDatabase(withoutSion)) {
-                return withoutSion;
+                return new String[]{withoutSion, "0", String.valueOf(withoutSion.length())};
             }
         }
 
         // 4. حذف پیشوندها
-        String[] prefixes = {"un", "re", "in", "im", "ir", "il", "dis", "mis", "over", "under"};
+        String[] prefixes = {"un", "re", "in", "im", "ir", "il", "dis", "mis", "over", "under", "pre", "post", "anti"};
         for (String prefix : prefixes) {
             if (lowerWord.startsWith(prefix) && lowerWord.length() > prefix.length() + 1) {
                 String withoutPrefix = lowerWord.substring(prefix.length());
                 if (wordExistsInDatabase(withoutPrefix)) {
-                    return withoutPrefix;
+                    return new String[]{withoutPrefix, String.valueOf(prefix.length()), String.valueOf(lowerWord.length())};
                 }
             }
         }
 
-        // 5. بررسی حالت جمع (s یا es)
+        // 5. حالت جمع
         if (lowerWord.endsWith("s") && lowerWord.length() > 2) {
             String withoutS = lowerWord.substring(0, lowerWord.length() - 1);
             if (wordExistsInDatabase(withoutS)) {
-                return withoutS;
+                return new String[]{withoutS, "0", String.valueOf(withoutS.length())};
             }
-            // برای کلماتی که با es جمع می‌شوند
             if (lowerWord.endsWith("es")) {
                 String withoutEs = lowerWord.substring(0, lowerWord.length() - 2);
                 if (wordExistsInDatabase(withoutEs)) {
-                    return withoutEs;
-                }
-                // مثل: boxes → box
-                if (withoutEs.endsWith("x") || withoutEs.endsWith("s") ||
-                        withoutEs.endsWith("ch") || withoutEs.endsWith("sh")) {
-                    if (wordExistsInDatabase(withoutEs)) {
-                        return withoutEs;
-                    }
-                }
-            }
-        }
-
-        // 6. کاهش تدریجی حروف از انتها (برای کلمات بسیار بلند)
-        if (lowerWord.length() > 6) {
-            for (int i = lowerWord.length() - 2; i >= 3; i--) {
-                String subWord = lowerWord.substring(0, i);
-                if (wordExistsInDatabase(subWord)) {
-                    return subWord;
+                    return new String[]{withoutEs, "0", String.valueOf(withoutEs.length())};
                 }
             }
         }
@@ -218,7 +197,7 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
     }
 
     /**
-     * تنظیم متن مثال با قابلیت کلیک روی کلمات موجود در دیکشنری
+     * تنظیم متن مثال با قابلیت کلیک - فقط زیر بخش تطابق‌یافته خط کشیده میشه
      */
     private void setupClickableExample(String example) {
         if (example == null || example.isEmpty()) {
@@ -226,40 +205,43 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
             return;
         }
 
-        // حذف نقل قول‌ها اگر وجود داشته باشند
         String cleanExample = example.replaceAll("^\"|\"$", "");
-
         SpannableString spannableString = new SpannableString(cleanExample);
 
-        // الگوی تشخیص کلمات انگلیسی (حداقل 2 حرف)
         Pattern pattern = Pattern.compile("\\b[A-Za-z]{2,}\\b");
         Matcher matcher = pattern.matcher(cleanExample);
 
-        // لیست کلماتی که قبلاً پردازش شده‌اند تا از تداخل جلوگیری شود
         ArrayList<String> processedWords = new ArrayList<>();
 
         while (matcher.find()) {
             final String originalWord = matcher.group();
-            int start = matcher.start();
-            int end = matcher.end();
+            int wordStart = matcher.start();
+            int wordEnd = matcher.end();
 
-            // اگر کلمه با کلمه اصلی یکی نباشد و قبلاً پردازش نشده باشد
             if (!originalWord.equalsIgnoreCase(currentWord) && !processedWords.contains(originalWord.toLowerCase())) {
                 processedWords.add(originalWord.toLowerCase());
 
-                // پیدا کردن بهترین تطابق در دیکشنری با جستجوی دیتابیس
-                final String matchedWord = findBestMatchingWord(originalWord);
+                String[] matchResult = findBestMatchingWithPosition(originalWord);
 
-                if (matchedWord != null) {
-                    // کلمه پیدا شد - زیر خط بکش و کلیک‌پذیر کن
-                    spannableString.setSpan(new UnderlineSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if (matchResult != null) {
+                    String matchedWord = matchResult[0];
+                    int matchStartInWord = Integer.parseInt(matchResult[1]);
+                    int matchEndInWord = Integer.parseInt(matchResult[2]);
 
+                    // محاسبه موقعیت دقیق در متن اصلی
+                    int globalStart = wordStart + matchStartInWord;
+                    int globalEnd = wordStart + matchEndInWord;
+
+                    final String finalMatchedWord = matchedWord;
+
+                    // زیر بخش تطابق‌یافته خط بکش
+                    spannableString.setSpan(new UnderlineSpan(), globalStart, globalEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     spannableString.setSpan(new ClickableSpan() {
                         @Override
                         public void onClick(View widget) {
-                            navigateToWord(matchedWord);
+                            navigateToWord(finalMatchedWord);
                         }
-                    }, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }, globalStart, globalEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
         }
@@ -269,73 +251,93 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
     }
 
     /**
-     * تنظیم مترادف‌ها با قابلیت کلیک
+     * تنظیم مترادف‌ها با قابلیت کلیک و نمایش معنی فارسی
      */
     private void setupClickableSynonyms(String synonym) {
         if (synonym == null || synonym.isEmpty()) {
             synonymText.setText("");
+            synonymPersianLayout.setVisibility(View.GONE);
             return;
         }
 
-        // جداسازی مترادف‌ها با کاما یا ویرگول
         String[] synonyms = synonym.split("[,،]");
         StringBuilder displayText = new StringBuilder();
+        StringBuilder persianText = new StringBuilder();
 
         for (int i = 0; i < synonyms.length; i++) {
             String syn = synonyms[i].trim();
             if (!syn.isEmpty()) {
-                if (i > 0) displayText.append("، ");
+                if (i > 0) {
+                    displayText.append("، ");
+                    persianText.append("، ");
+                }
                 displayText.append(syn);
+
+                HashMap<String, String> synData = dbHelper.getWordByExactMatch(syn.toLowerCase());
+                if (synData != null && synData.containsKey("persian")) {
+                    persianText.append(synData.get("persian"));
+                } else {
+                    String[] matchResult = findBestMatchingWithPosition(syn);
+                    if (matchResult != null) {
+                        String matchedWord = matchResult[0];
+                        HashMap<String, String> matchedData = dbHelper.getWordByExactMatch(matchedWord);
+                        if (matchedData != null && matchedData.containsKey("persian")) {
+                            persianText.append(matchedData.get("persian"));
+                        } else {
+                            persianText.append("—");
+                        }
+                    } else {
+                        persianText.append("—");
+                    }
+                }
             }
         }
 
         String synText = displayText.toString();
         SpannableString spannableString = new SpannableString(synText);
 
-        // الگوی تشخیص کلمات انگلیسی
         Pattern pattern = Pattern.compile("\\b[A-Za-z]{2,}\\b");
         Matcher matcher = pattern.matcher(synText);
 
         while (matcher.find()) {
             final String originalWord = matcher.group();
-            int start = matcher.start();
-            int end = matcher.end();
+            int wordStart = matcher.start();
+            int wordEnd = matcher.end();
 
-            // بررسی وجود کلمه در دیتابیس
-            if (wordExistsInDatabase(originalWord.toLowerCase())) {
-                spannableString.setSpan(new UnderlineSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            String[] matchResult = findBestMatchingWithPosition(originalWord);
 
+            if (matchResult != null) {
+                String matchedWord = matchResult[0];
+                int matchStartInWord = Integer.parseInt(matchResult[1]);
+                int matchEndInWord = Integer.parseInt(matchResult[2]);
+
+                int globalStart = wordStart + matchStartInWord;
+                int globalEnd = wordStart + matchEndInWord;
+
+                final String finalMatchedWord = matchedWord;
+
+                spannableString.setSpan(new UnderlineSpan(), globalStart, globalEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 spannableString.setSpan(new ClickableSpan() {
                     @Override
                     public void onClick(View widget) {
-                        navigateToWord(originalWord.toLowerCase());
+                        navigateToWord(finalMatchedWord);
                     }
-                }, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            } else {
-                // اگر کلمه دقیقاً نبود، بهترین تطابق رو پیدا کن
-                final String matchedWord = findBestMatchingWord(originalWord);
-                if (matchedWord != null) {
-                    spannableString.setSpan(new UnderlineSpan(), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    spannableString.setSpan(new ClickableSpan() {
-                        @Override
-                        public void onClick(View widget) {
-                            navigateToWord(matchedWord);
-                        }
-                    }, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                }
+                }, globalStart, globalEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
 
         synonymText.setText(spannableString);
         synonymText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+
+        if (persianText.length() > 0) {
+            synonymPersianText.setText(persianText.toString());
+            synonymPersianLayout.setVisibility(View.VISIBLE);
+        } else {
+            synonymPersianLayout.setVisibility(View.GONE);
+        }
     }
 
-    /**
-     * هدایت به صفحه جزئیات کلمه انتخاب شده
-     */
     private void navigateToWord(String word) {
-        // بررسی وجود کلمه در دیتابیس
         new Thread(() -> {
             HashMap<String, String> wordData = dbHelper.getWordByExactMatch(word);
             runOnUiThread(() -> {
@@ -414,14 +416,10 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         });
     }
 
-    /**
-     * دکمه تلفظ مثال
-     */
     private void setupSpeakExampleButton() {
         speakExampleIcon.setOnClickListener(v -> {
             String example = wordData.get("example");
             if (example != null && !example.isEmpty()) {
-                // حذف نقل قول‌ها
                 String cleanExample = example.replaceAll("^\"|\"$", "");
                 speakWord(cleanExample);
             } else {
@@ -430,10 +428,45 @@ public class WordDetailActivity extends AppCompatActivity implements TextToSpeec
         });
     }
 
+    private void setupSpeakSynonymButton() {
+        speakSynonymIcon.setOnClickListener(v -> {
+            String synonym = wordData.get("synonym");
+            if (synonym != null && !synonym.isEmpty()) {
+                String[] synonyms = synonym.split("[,،]");
+                if (synonyms.length > 0) {
+                    String firstSynonym = synonyms[0].trim();
+                    if (!firstSynonym.isEmpty()) {
+                        speakWord(firstSynonym);
+                    }
+                }
+            } else {
+                Toast.makeText(this, "مترادفی برای تلفظ وجود ندارد", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupSpeakPersianButton() {
+        speakPersianIcon.setOnClickListener(v -> {
+            String persian = wordData.get("persian");
+            if (persian != null && !persian.isEmpty()) {
+                speakPersianWord(persian);
+            } else {
+                Toast.makeText(this, "معنی فارسی برای تلفظ وجود ندارد", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void speakWord(String word) {
         if (textToSpeech != null) {
             textToSpeech.setLanguage(Locale.US);
             textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+    }
+
+    private void speakPersianWord(String persian) {
+        if (textToSpeech != null) {
+            textToSpeech.setLanguage(new Locale("fa", "IR"));
+            textToSpeech.speak(persian, TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }
 

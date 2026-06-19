@@ -55,25 +55,50 @@
                 </FrameLayout>
 
                 <!-- کلمه و معنی -->
-                <TextView
-                    android:fontFamily="@font/yekan"
-                    android:id="@+id/wordText"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="#2c3e50"
-                    android:gravity="center" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:fontFamily="@font/yekan"
-                    android:id="@+id/persianText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textColor="#7f8c8d"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp" />
+                    <TextView
+                        android:fontFamily="@font/yekan"
+                        android:id="@+id/wordText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="#2c3e50"
+                        android:gravity="center" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="4dp">
+
+                        <TextView
+                            android:fontFamily="@font/yekan"
+                            android:id="@+id/persianText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="18sp"
+                            android:textColor="#7f8c8d"
+                            android:gravity="center" />
+
+                        <ImageButton
+                            android:id="@+id/speakPersianIcon"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_speaker_small"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="تلفظ فارسی"
+                            app:tint="#e67e22" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <!-- تلفظ و سطح -->
                 <LinearLayout
@@ -219,7 +244,7 @@
                     android:fontFamily="@font/yekan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="💡 روی کلمات انگلیسی کلیک کنید تا معنی آنها را ببینید"
+                    android:text="💡 روی کلمات زیرخط‌دار کلیک کنید تا معنی آنها را ببینید"
                     android:textSize="11sp"
                     android:textColor="#999"
                     android:layout_marginTop="8dp"
@@ -245,14 +270,33 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:fontFamily="@font/yekan"
-                    android:layout_width="wrap_content"
+                <!-- هدر مترادف با دکمه تلفظ -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="🔄 مترادف"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#2c3e50" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:fontFamily="@font/yekan"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🔄 مترادف"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#2c3e50" />
+
+                    <ImageButton
+                        android:id="@+id/speakSynonymIcon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_speaker_small"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="تلفظ مترادف"
+                        app:tint="#9b59b6" />
+
+                </LinearLayout>
 
                 <TextView
                     android:fontFamily="@font/yekan"
@@ -263,6 +307,35 @@
                     android:textColor="#555"
                     android:layout_marginTop="8dp"
                     android:textIsSelectable="true" />
+
+                <!-- معنی فارسی مترادف‌ها -->
+                <LinearLayout
+                    android:id="@+id/synonymPersianLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:padding="8dp"
+                    android:background="#f8f9fa"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:fontFamily="@font/yekan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🇮🇷 "
+                        android:textSize="14sp"
+                        android:textColor="#7f8c8d" />
+
+                    <TextView
+                        android:fontFamily="@font/yekan"
+                        android:id="@+id/synonymPersianText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="#7f8c8d" />
+
+                </LinearLayout>
 
                 <!-- راهنمای کلیک روی مترادف‌ها -->
                 <TextView
